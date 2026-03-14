@@ -1,143 +1,293 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Apply Now | DevRoots Academy</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+@extends('layouts.frontend')
 
-    <!-- Red-themed CSS -->
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
+@section('title', 'Apply Now | DevRoots Academy')
+@section('meta_description', 'Apply to study at DevRoots Academy. Start your hands-on IT learning journey today in Masaka, Uganda.')
 
-<!-- HEADER -->
-<header class="glass-header" style="background-color: #ffffff; color: white;">
-    <div class="container nav-container">
-        <div class="logo">DevRoots <span>Academy</span></div>
-        <nav>
-            <ul class="nav-links">
-                <li><a href="{{ url('/') }}">Home</a></li>
-                <li><a href="{{ url('/courses') }}">Courses</a></li>
-                <li><a href="{{ url('/apply-now') }}" class="active">Apply Now</a></li>
-                <li><a href="{{ url('/login') }}" class="btn btn-outline">Login</a></li>
-            </ul>
-        </nav>
-    </div>
-</header>
+@section('content')
 
-<!-- HERO -->
-<section class="instructor-hero" style="background-color: #FF4C4C; color: white; padding: 60px 0; text-align: center;">
+{{-- ===== PAGE TOP BAR ===== --}}
+<div class="form-page-top">
     <div class="container">
-        <h1>Start Your Learning Journey</h1>
-        <p>Apply today and gain hands-on tech skills designed for real-world impact.</p>
+        <div class="d-flex align-items-center gap-3">
+            <div class="fp-icon">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div>
+                <h1>Student Application</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+                        <li class="breadcrumb-item active">Apply Now</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- ===== MAIN CONTENT ===== --}}
+<section class="section section-sm">
+    <div class="container">
+        <div class="row g-4 g-xl-5 align-items-start">
+
+            {{-- ===== LEFT: BENEFITS PANEL ===== --}}
+            <div class="col-lg-4">
+                <div class="benefits-panel">
+
+                    <img src="{{ asset('images/logo-square.png') }}"
+                         alt="DevRoots Academy"
+                         class="bp-logo">
+
+                    <h2>Why Learn at DevRoots?</h2>
+                    <p class="bp-subtitle">
+                        Join hundreds of students already building real-world
+                        IT skills and transforming their careers in Masaka.
+                    </p>
+
+                    <ul class="benefits-list">
+                        <li>
+                            <div class="bl-icon"><i class="fas fa-laptop-code"></i></div>
+                            <span class="bl-text">Practical, hands-on training from day one</span>
+                        </li>
+                        <li>
+                            <div class="bl-icon"><i class="fas fa-industry"></i></div>
+                            <span class="bl-text">Industry-relevant, up-to-date curriculum</span>
+                        </li>
+                        <li>
+                            <div class="bl-icon"><i class="fas fa-layer-group"></i></div>
+                            <span class="bl-text">Beginner to advanced learning paths</span>
+                        </li>
+                        <li>
+                            <div class="bl-icon"><i class="fas fa-users"></i></div>
+                            <span class="bl-text">Supportive mentors &amp; dedicated instructors</span>
+                        </li>
+                        <li>
+                            <div class="bl-icon"><i class="fas fa-cloud"></i></div>
+                            <span class="bl-text">Moodle-powered online learning platform</span>
+                        </li>
+                        <li>
+                            <div class="bl-icon"><i class="fas fa-certificate"></i></div>
+                            <span class="bl-text">Recognised certification on completion</span>
+                        </li>
+                    </ul>
+
+                    <hr class="bp-divider">
+
+                    <div class="bp-stats">
+                        <div class="bps-item">
+                            <span class="bps-num">500+</span>
+                            <span class="bps-lbl">Students</span>
+                        </div>
+                        <div class="bps-item">
+                            <span class="bps-num">12+</span>
+                            <span class="bps-lbl">Courses</span>
+                        </div>
+                        <div class="bps-item">
+                            <span class="bps-num">95%</span>
+                            <span class="bps-lbl">Satisfaction</span>
+                        </div>
+                        <div class="bps-item">
+                            <span class="bps-num">8+</span>
+                            <span class="bps-lbl">Partners</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            {{-- ===== RIGHT: FORM PANEL ===== --}}
+            <div class="col-lg-8">
+                <div class="form-panel">
+
+                    {{-- Panel header --}}
+                    <div class="form-panel-top">
+                        <h3><i class="fas fa-file-alt text-primary me-2"></i>Application Form</h3>
+                        <p>Fill in the details below and we'll get back to you within 24 hours.</p>
+                    </div>
+
+                    {{-- Alerts --}}
+                    @if(session('success'))
+                        <div class="alert-success-msg mx-4 mt-3">
+                            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if($errors->any())
+                        <div class="alert-error-msg mx-4 mt-3">
+                            <ul class="mb-0">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('frontend.apply.submit') }}" method="POST" novalidate>
+                        @csrf
+
+                        <div class="form-panel-body">
+
+                            {{-- Section: Personal Info --}}
+                            <div class="form-section-group">
+                                <p class="form-section-hd">
+                                    <i class="fas fa-user"></i>Personal Information
+                                </p>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="full_name" class="form-label">
+                                            Full Name <span class="text-primary">*</span>
+                                        </label>
+                                        <input type="text" id="full_name" name="full_name"
+                                               class="form-control @error('full_name') is-invalid @enderror"
+                                               placeholder="Your full name"
+                                               value="{{ old('full_name') }}" required>
+                                        @error('full_name')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="username" class="form-label">Username</label>
+                                        <input type="text" id="username" name="username"
+                                               class="form-control @error('username') is-invalid @enderror"
+                                               placeholder="Choose a username"
+                                               value="{{ old('username') }}">
+                                        @error('username')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="email" class="form-label">Email Address</label>
+                                        <input type="email" id="email" name="email"
+                                               class="form-control @error('email') is-invalid @enderror"
+                                               placeholder="you@example.com"
+                                               value="{{ old('email') }}">
+                                        @error('email')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="phone" class="form-label">
+                                            Phone Number <span class="text-primary">*</span>
+                                        </label>
+                                        <input type="tel" id="phone" name="phone"
+                                               class="form-control @error('phone') is-invalid @enderror"
+                                               placeholder="+256 7xx xxx xxx"
+                                               value="{{ old('phone') }}" required>
+                                        @error('phone')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="dob" class="form-label">Date of Birth</label>
+                                        <input type="date" id="dob" name="dob"
+                                               class="form-control @error('dob') is-invalid @enderror"
+                                               value="{{ old('dob') }}">
+                                        @error('dob')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="location" class="form-label">Location</label>
+                                        <input type="text" id="location" name="location"
+                                               class="form-control @error('location') is-invalid @enderror"
+                                               placeholder="City, Country"
+                                               value="{{ old('location') }}">
+                                        @error('location')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Section: Course Selection --}}
+                            <div class="form-section-group">
+                                <p class="form-section-hd">
+                                    <i class="fas fa-book-open"></i>Course Selection
+                                </p>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label for="course_interest" class="form-label">
+                                            Select Course <span class="text-primary">*</span>
+                                        </label>
+                                        <select id="course_interest" name="course_interest"
+                                                class="form-select @error('course_interest') is-invalid @enderror"
+                                                required>
+                                            <option value="">Choose your course of interest</option>
+                                            @foreach([
+                                                'Programming Fundamentals',
+                                                'Web Development',
+                                                'AI & Machine Learning',
+                                                'Mobile App Development',
+                                                'Cloud Computing',
+                                                'Networking Essentials',
+                                                'Computer Repair & Maintenance',
+                                                'Internet of Things (IoT)',
+                                            ] as $course)
+                                                <option value="{{ $course }}"
+                                                    {{ old('course_interest') === $course ? 'selected' : '' }}>
+                                                    {{ $course }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('course_interest')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label for="goals" class="form-label">
+                                            Why do you want to join?
+                                            <span class="fw-normal" style="color:var(--text-muted);">(Optional)</span>
+                                        </label>
+                                        <textarea id="goals" name="goals"
+                                                  class="form-control @error('goals') is-invalid @enderror"
+                                                  rows="3"
+                                                  placeholder="Tell us about your learning goals and what you hope to achieve...">{{ old('goals') }}</textarea>
+                                        @error('goals')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>{{-- /form-panel-body --}}
+
+                        {{-- Submit area --}}
+                        <div class="submit-area">
+                            <div class="form-check">
+                                <input type="checkbox" id="terms" name="terms"
+                                       class="form-check-input @error('terms') is-invalid @enderror"
+                                       {{ old('terms') ? 'checked' : '' }} required>
+                                <label class="form-check-label" for="terms">
+                                    I agree to the
+                                    <a href="{{ route('contact') }}" class="text-primary">terms &amp; conditions</a>.
+                                </label>
+                                @error('terms')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Submit Application
+                            </button>
+
+                            <p class="trust-note">
+                                <i class="fas fa-lock"></i>
+                                Your information is secure and will never be shared.
+                            </p>
+                        </div>
+
+                    </form>
+                </div>{{-- /form-panel --}}
+            </div>
+
+        </div>
     </div>
 </section>
 
-<!-- APPLICATION SECTION -->
-<section class="instructor-apply" style="padding: 50px 0; background-color: #FFF5F5;">
-    <div class="container instructor-grid" style="display: flex; gap: 40px; flex-wrap: wrap;">
-
-        <!-- INFO PANEL -->
-        <div class="instructor-info" style="flex: 1; min-width: 300px;">
-            <h2 style="color: #8B0000;">Why Learn at DevRoots?</h2>
-            <ul style="list-style: none; padding-left: 0; color: #333;">
-                <li>✔ Practical, hands-on training</li>
-                <li>✔ Industry-relevant courses</li>
-                <li>✔ Beginner to advanced learning paths</li>
-                <li>✔ Supportive mentors & instructors</li>
-                <li>✔ Moodle-powered learning platform</li>
-            </ul>
-        </div>
-
-        <!-- FORM CARD -->
-        <div class="instructor-form-card" style="flex: 1; min-width: 300px; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-            <h2 style="color: #8B0000;">Student Application</h2>
-
-            @if(session('success'))
-                <div class="success-message" style="background: #DFF2BF; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            <form action="{{ route('frontend.apply.submit') }}" method="POST">
-                @csrf
-
-                <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
-                    <div class="form-group" style="flex:1;">
-                        <label>Full Name</label>
-                        <input type="text" name="full_name" placeholder="Your full name" required>
-                    </div>
-
-                    <div class="form-group" style="flex:1;">
-                        <label>Username</label>
-                        <input type="text" name="username" placeholder="Choose a username">
-                    </div>
-                </div>
-
-                <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
-                    <div class="form-group" style="flex:1;">
-                        <label>Email Address</label>
-                        <input type="email" name="email" placeholder="you@example.com">
-                    </div>
-
-                    <div class="form-group" style="flex:1;">
-                        <label>Phone Number</label>
-                        <input type="tel" name="phone" placeholder="+256 7xx xxx xxx" required>
-                    </div>
-                </div>
-
-                <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
-                    <div class="form-group" style="flex:1;">
-                        <label>Date of Birth</label>
-                        <input type="date" name="dob">
-                    </div>
-
-                    <div class="form-group" style="flex:1;">
-                        <label>Location</label>
-                        <input type="text" name="location" placeholder="City, Country">
-                    </div>
-                </div>
-
-                <div class="form-row" style="margin-bottom: 15px;">
-                    <div class="form-group full-width">
-                        <label>Select Course</label>
-                        <select name="course_interest" required>
-                            <option value="">Choose your course</option>
-                            <option>Programming Fundamentals</option>
-                            <option>Web Development</option>
-                            <option>AI & Machine Learning</option>
-                            <option>Mobile App Development</option>
-                            <option>Cloud Computing</option>
-                            <option>Networking Essentials</option>
-                            <option>Computer Repair & Maintenance</option>
-                            <option>Internet of Things (IoT)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row" style="margin-bottom: 15px;">
-                    <div class="form-group full-width">
-                        <label>Why do you want to join? (Optional)</label>
-                        <textarea name="goals" rows="3" placeholder="Tell us your learning goals..."></textarea>
-                    </div>
-                </div>
-
-                <div class="form-row terms" style="margin-bottom: 15px;">
-                    <input type="checkbox" name="terms" required>
-                    <label>I agree to the <a href="#" style="color:#8B0000;">terms & conditions</a>.</label>
-                </div>
-
-                <button type="submit" class="btn-submit" style="background-color:#8B0000; color:white; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">
-                    Submit Application
-                </button>
-
-            </form>
-        </div>
-
-    </div>
-</section>
-
-<script src="{{ asset('js/main.js') }}"></script>
-</body>
-</html>
+@endsection

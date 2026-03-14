@@ -1,0 +1,20 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+    RewriteBase /devrootsacademy/
+
+    # Stop processing when the request is already for our bootstrap file
+    RewriteRule ^index\.php$ - [L,END]
+
+    # Serve static files that exist in public/ (css, js, images, etc.)
+    RewriteCond %{DOCUMENT_ROOT}/devrootsacademy/public/$1 -f
+    RewriteRule ^(.+)$ public/$1 [L,END]
+
+    # Route all dynamic requests to root index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L,END]
+</IfModule>

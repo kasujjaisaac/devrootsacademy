@@ -9,26 +9,36 @@ class FrontendInstructorController extends Controller
 {
     public function submit(Request $request)
     {
-        $request->validate([
-            'full_name' => 'required|string',
-            'email' => 'required|email',
-            'phone' => 'required',
-            'expertise' => 'required',
-            'experience_years' => 'required|integer',
-            'bio' => 'required',
+        $validated = $request->validate([
+            'full_name'        => 'required|string|max:255',
+            'email'            => 'required|email|max:255|unique:instructors,email',
+            'phone'            => 'required|string|max:20',
+            'expertise'        => 'required|string|max:255',
+            'experience_years' => 'required|integer|min:0|max:60',
+            'bio'              => 'required|string|min:50|max:3000',
+            'portfolio'        => 'nullable|url|max:500',
+        ], [
+            'email.unique'           => 'An application with this email already exists.',
+            'experience_years.min'   => 'Years of experience cannot be negative.',
+            'experience_years.max'   => 'Please enter a valid number of years.',
+            'bio.min'                => 'Please provide at least 50 characters in your bio.',
+            'portfolio.url'          => 'Portfolio must be a valid URL (e.g. https://yoursite.com).',
         ]);
 
         Instructor::create([
-            'full_name' => $request->full_name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'expertise' => $request->expertise,
-            'experience_years' => $request->experience_years,
-            'bio' => $request->bio,
-            'portfolio' => $request->portfolio,
-            'status' => 'pending',
+            'full_name'        => $validated['full_name'],
+            'email'            => $validated['email'],
+            'phone'            => $validated['phone'],
+            'expertise'        => $validated['expertise'],
+            'experience_years' => $validated['experience_years'],
+            'bio'              => $validated['bio'],
+            'portfolio'        => $validated['portfolio'] ?? null,
+            'status'           => 'pending',
         ]);
 
-        return back()->with('success', 'Application submitted successfully!');
+        return back()->with(
+            'success',
+            'Your instructor application has been submitted! Our team will review it and get back to you shortly.'
+        );
     }
 }

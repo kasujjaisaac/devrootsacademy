@@ -1,24 +1,13 @@
 // =======================================
-// DEVROOTS ACADEMY – INTERACTIVE JS (ULTRA-PREMIUM)
+// DEVROOTS ACADEMY – SITE INTERACTIONS
 // =======================================
 document.addEventListener("DOMContentLoaded", () => {
 
   // ------------------------------
   // UTILITY FUNCTIONS
   // ------------------------------
-  const qs = (selector, parent = document) => parent.querySelector(selector);
-  const qsa = (selector, parent = document) => parent.querySelectorAll(selector);
-
-  // ------------------------------
-  // HAMBURGER MENU (MOBILE)
-  // ------------------------------
-  const hamburger = qs(".hamburger");
-  const navMenu = qs("nav ul");
-
-  hamburger?.addEventListener("click", () => {
-    navMenu?.classList.toggle("active");
-    hamburger.classList.toggle("active");
-  });
+  const qs  = (sel, ctx = document) => ctx.querySelector(sel);
+  const qsa = (sel, ctx = document) => ctx.querySelectorAll(sel);
 
   // ------------------------------
   // BACK TO TOP BUTTON
@@ -26,46 +15,47 @@ document.addEventListener("DOMContentLoaded", () => {
   const backToTop = qs("#back-to-top");
 
   if (backToTop) {
-    const toggleBackToTop = () => backToTop.style.display = window.scrollY > 300 ? "block" : "none";
+    const toggleBackToTop = () => {
+      backToTop.style.display = window.scrollY > 300 ? "flex" : "none";
+    };
     window.addEventListener("scroll", toggleBackToTop);
     toggleBackToTop();
-
     backToTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
   }
 
   // ------------------------------
   // LIVE CHAT TOGGLE & BOT SIMULATION
   // ------------------------------
-  const chatBtn = qs("#live-chat .chat-btn");
-  const chatBox = qs("#live-chat .chat-box");
-  const sendBtn = qs("#send-btn");
+  const chatBtn   = qs("#live-chat .chat-btn");
+  const chatBox   = qs("#live-chat .chat-box");
+  const sendBtn   = qs("#send-btn");
   const chatInput = qs("#chat-input");
-  const chatMessages = qs("#chat-messages");
+  const chatMsgs  = qs("#chat-messages");
 
-  if (chatBtn && chatBox && sendBtn && chatInput && chatMessages) {
-    const addMessage = (text, isBot = false) => {
-      const p = document.createElement("p");
+  if (chatBtn && chatBox && sendBtn && chatInput && chatMsgs) {
+    const addMsg = (text, isBot = false) => {
+      const p       = document.createElement("p");
       p.textContent = text;
-      p.style.margin = "0.3rem 0";
-      p.style.padding = isBot ? "0.4rem 0.6rem" : "0.5rem 0.8rem";
-      p.style.borderRadius = "12px";
-      p.style.background = isBot ? "#f9f9f9" : "#f1f1f1";
-      p.style.fontStyle = isBot ? "italic" : "normal";
-      p.style.textAlign = isBot ? "left" : "right";
-      chatMessages.appendChild(p);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+      p.style.margin     = "0.3rem 0";
+      p.style.padding    = isBot ? "0.4rem 0.6rem" : "0.5rem 0.8rem";
+      p.style.fontStyle  = isBot ? "italic" : "normal";
+      p.style.textAlign  = isBot ? "left" : "right";
+      p.style.background = isBot ? "#f0f0f0" : "#FFEBEE";
+      chatMsgs.appendChild(p);
+      chatMsgs.scrollTop = chatMsgs.scrollHeight;
     };
 
     const sendMessage = () => {
       const msg = chatInput.value.trim();
       if (!msg) return;
-      addMessage(msg); // User message
+      addMsg(msg);
       chatInput.value = "";
-      setTimeout(() => addMessage("DevRoots: Thanks! We'll get back to you soon.", true), 800);
+      setTimeout(() => addMsg("DevRoots: Thanks! We'll get back to you soon.", true), 800);
     };
 
     chatBtn.addEventListener("click", () => {
-      chatBox.style.display = chatBox.style.display === "flex" ? "none" : "flex";
+      const isOpen = chatBox.style.display === "flex";
+      chatBox.style.display       = isOpen ? "none" : "flex";
       chatBox.style.flexDirection = "column";
     });
 
@@ -74,96 +64,67 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ------------------------------
-  // TESTIMONIALS CAROUSEL
+  // TESTIMONIALS SLIDER
   // ------------------------------
-  const slides = qsa(".testimonial-slide");
-  const prevBtn = qs(".testimonial-slider .prev");
-  const nextBtn = qs(".testimonial-slider .next");
-  const dots = qsa(".testimonial-slider .dot");
-  let currentSlide = 0;
-  let slideInterval;
+  const slides  = qsa(".testimonial-slide");
+  const prevBtn = qs(".testimonial-controls .prev");
+  const nextBtn = qs(".testimonial-controls .next");
+  const dots    = qsa(".testimonial-dots .dot");
+  let current   = 0;
+  let interval;
 
-  const showSlide = (index) => {
-    slides.forEach((slide, i) => slide.classList.toggle("active", i === index));
-    dots.forEach((dot, i) => dot.classList.toggle("active", i === index));
+  const showSlide = (idx) => {
+    slides.forEach((s, i) => s.classList.toggle("active", i === idx));
+    dots.forEach((d, i)   => d.classList.toggle("active", i === idx));
   };
 
-  const nextSlide = () => {
-    currentSlide = (currentSlide + 1) % slides.length;
-    showSlide(currentSlide);
-  };
+  const goNext = () => { current = (current + 1) % slides.length; showSlide(current); };
+  const goPrev = () => { current = (current - 1 + slides.length) % slides.length; showSlide(current); };
 
-  const prevSlide = () => {
-    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-    showSlide(currentSlide);
-  };
+  const startAuto = () => { interval = setInterval(goNext, 5000); };
+  const stopAuto  = () => clearInterval(interval);
 
-  const startAutoSlide = () => slideInterval = setInterval(nextSlide, 5000);
-  const stopAutoSlide = () => clearInterval(slideInterval);
-
-  nextBtn?.addEventListener("click", () => { nextSlide(); stopAutoSlide(); startAutoSlide(); });
-  prevBtn?.addEventListener("click", () => { prevSlide(); stopAutoSlide(); startAutoSlide(); });
-  dots.forEach((dot, i) => dot.addEventListener("click", () => { currentSlide = i; showSlide(i); stopAutoSlide(); startAutoSlide(); }));
-
-  if (slides.length) { showSlide(currentSlide); startAutoSlide(); }
-
+  if (slides.length) {
+    nextBtn?.addEventListener("click", () => { goNext(); stopAuto(); startAuto(); });
+    prevBtn?.addEventListener("click", () => { goPrev(); stopAuto(); startAuto(); });
+    dots.forEach((d, i) => d.addEventListener("click", () => {
+      current = i; showSlide(i); stopAuto(); startAuto();
+    }));
+    showSlide(current);
+    startAuto();
+  }
 
   // ------------------------------
-  // CONTACT FORM SUBMISSION
+  // NEWSLETTER FORM
   // ------------------------------
-const contactForm = document.getElementById("contactForm");
-
-contactForm?.addEventListener("submit", (e) => {
-e.preventDefault();
-alert("Thank you! Your application has been submitted.");
-contactForm.reset();
-});
-
-
-  // ------------------------------
-  // SCROLL-TRIGGERED ANIMATIONS
-  // ------------------------------
-  const scrollElements = qsa(".hero-content, .courses, .about, .featured-courses, .testimonials, .contact");
-
-  const handleScrollAnimation = () => {
-    scrollElements.forEach(el => {
-      const top = el.getBoundingClientRect().top;
-      if (top <= window.innerHeight * 0.85) el.classList.add("scrolled");
-    });
-  };
-
-  let ticking = false;
-  window.addEventListener("scroll", () => {
-    if (!ticking) {
-      window.requestAnimationFrame(() => { handleScrollAnimation(); ticking = false; });
-      ticking = true;
-    }
+  const newsletterForm = qs("#newsletterForm");
+  newsletterForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    alert("Thank you for subscribing to our newsletter!");
+    newsletterForm.reset();
   });
 
-  handleScrollAnimation();
-});
-// =======================================
-// Back-to-Top Button
-const footerTopBtn = document.getElementById("footer-back-to-top");
-footerTopBtn?.addEventListener("click", () => {
-  window.scrollTo({ top: 0, behavior: "smooth" });
-});
+  // ------------------------------
+  // SCROLL-TRIGGERED FADE-IN
+  // ------------------------------
+  const scrollEls = qsa(".course-card, .why-item, .partner-logo-card");
+  if (scrollEls.length && "IntersectionObserver" in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity   = "1";
+          entry.target.style.transform = "translateY(0)";
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
 
-// Newsletter Form
-const newsletterForm = document.getElementById("newsletterForm");
-newsletterForm?.addEventListener("submit", (e) => {
-  e.preventDefault();
-  alert("Thank you for subscribing to our newsletter!");
-  newsletterForm.reset();
-});
+    scrollEls.forEach(el => {
+      el.style.opacity    = "0";
+      el.style.transform  = "translateY(14px)";
+      el.style.transition = "opacity 0.4s ease, transform 0.4s ease";
+      observer.observe(el);
+    });
+  }
 
-// Pause slider on hover
-const slider = document.querySelector('.slider-track');
-
-slider.addEventListener('mouseenter', () => {
-  slider.style.animationPlayState = 'paused';
-});
-
-slider.addEventListener('mouseleave', () => {
-  slider.style.animationPlayState = 'running';
 });

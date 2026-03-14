@@ -1,12 +1,12 @@
-use App\Models\Message;
-use Illuminate\Support\Facades\Auth;
 <?php
 
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
+use App\Models\Message;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
 {

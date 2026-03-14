@@ -28,6 +28,15 @@ use App\Http\Controllers\FrontendInstructorController;
 // Home page
 Route::view('/', 'frontend.index')->name('home');
 
+// About page
+Route::view('/about', 'frontend.about')->name('about');
+
+// Partners page
+Route::view('/partners', 'frontend.partners')->name('partners');
+
+// Contact page
+Route::view('/contact', 'frontend.contact')->name('contact');
+
 // Courses (DB driven)
 Route::get('/courses', [FrontendCourseController::class, 'index'])
     ->name('courses.index');
@@ -95,7 +104,7 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('admin')->middleware(['auth'])->group(function () {
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     // Dashboard
     Route::get('/', [DashboardController::class, 'index'])
@@ -176,14 +185,19 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Auth Routes (Laravel Breeze)
+| Admin Search
 |--------------------------------------------------------------------------
 */
 
 Route::get('/admin/search', function (\Illuminate\Http\Request $request) {
     $query = $request->input('query');
-    // You can implement search logic here later
     return redirect()->back()->with('message', "Search for: $query not implemented yet");
 })->name('admin.search');
+
+/*
+|--------------------------------------------------------------------------
+| Auth Routes (Laravel Breeze)
+|--------------------------------------------------------------------------
+*/
 
 require __DIR__.'/auth.php';

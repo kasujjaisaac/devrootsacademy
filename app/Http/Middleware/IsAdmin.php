@@ -5,16 +5,21 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class IsAdmin
 {
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
-        // Check if the user is logged in and is admin
-        if (Auth::check() && Auth::user()->is_admin) {
-            return $next($request);
+        if (!Auth::check() || !Auth::user()->isAdmin()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('admin.login')
+                ->withErrors(['email' => 'Access denied. Admin credentials required.']);
         }
 
-        abort(403, 'Unauthorized access.');
+        return $next($request);
     }
 }
