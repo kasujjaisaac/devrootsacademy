@@ -4,17 +4,18 @@
     </IfModule>
 
     RewriteEngine On
-    RewriteBase /devrootsacademy/
 
-    # Stop processing when the request is already for our bootstrap file
+    # 1. Leave index.php alone
     RewriteRule ^index\.php$ - [L,END]
 
-    # Serve static files that exist in public/ (css, js, images, etc.)
-    RewriteCond %{DOCUMENT_ROOT}/devrootsacademy/public/$1 -f
-    RewriteRule ^(.+)$ public/$1 [L,END]
+    # 2. Serve real files / directories directly (no rewrite needed)
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L,END]
 
-    # Route all dynamic requests to root index.php
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^ index.php [L,END]
+    # 3. Everything else → proxy into public/
+    #    [L] (not END) lets public/.htaccess handle both static assets
+    #    and Laravel routing — works whether the app is at the domain
+    #    root (production) or inside a subdirectory (local MAMP).
+    RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>
