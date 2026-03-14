@@ -14,8 +14,8 @@ return new class extends Migration {
             $table->boolean('is_admin')->default(false); // true if admin sent
             $table->timestamps();
 
-            $table->foreign('chat_id')->references('id')->on('chats')->onDelete('cascade');
-            $table->foreign('sender_id')->references('id')->on('users')->onDelete('cascade');
+            $table->index('chat_id');
+            $table->index('sender_id');
         });
     }
 

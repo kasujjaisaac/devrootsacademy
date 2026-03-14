@@ -9,7 +9,14 @@ class Payment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['student_id', 'course_id', 'amount', 'payment_method'];
+    protected $fillable = [
+        'student_id', 'course_id', 'amount', 'method',
+        'reference', 'status', 'paid_at',
+    ];
+
+    protected $casts = [
+        'paid_at' => 'datetime',
+    ];
 
     public function student()
     {

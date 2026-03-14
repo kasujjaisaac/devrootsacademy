@@ -15,9 +15,9 @@ return new class extends Migration
             $table->string('status')->default('pending'); // pending, active, finished
             $table->timestamps();
 
-            // Foreign keys
-            $table->foreign('student_id')->references('id')->on('students')->onDelete('cascade');
-            $table->foreign('course_id')->references('id')->on('courses')->onDelete('cascade');
+            // Indexes only (parent tables use MyISAM which doesn't support FK constraints)
+            $table->index('student_id');
+            $table->index('course_id');
         });
     }
 

@@ -60,7 +60,7 @@ class DashboardController extends Controller
             ->get()
             ->map(function($enrollment){
                 return [
-                    'student_name' => $enrollment->student->name,
+                    'student_name' => $enrollment->student->full_name ?? $enrollment->student->name ?? 'N/A',
                     'student_avatar' => $enrollment->student->avatar ?? asset('images/avatar.png'),
                     'course_title' => $enrollment->course->title,
                     'status' => $enrollment->status ?? 'N/A',

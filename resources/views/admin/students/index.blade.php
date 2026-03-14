@@ -1,58 +1,104 @@
 @extends('layouts.admin')
-@section('title','Students')
+@section('title', 'Students')
 
 @section('content')
-<h1 class="text-3xl font-bold mb-6">Students</h1>
 
-<div class="bg-white p-6 rounded-xl shadow">
-
-    <input
-        type="text"
-        placeholder="Search student..."
-        class="border p-2 rounded w-full mb-4"
-        onkeyup="filterTable(this.value)"
-    >
-
-    <table class="w-full border-collapse">
-        <thead>
-            <tr class="bg-gray-100 text-left">
-                <th class="p-3 border-b">Name</th>
-                <th class="p-3 border-b">Email</th>
-                <th class="p-3 border-b">Phone</th>
-                <th class="p-3 border-b">Course Interest</th>
-                <th class="p-3 border-b">Status</th>
-                <th class="p-3 border-b">Joined</th>
-            </tr>
-        </thead>
-        <tbody id="studentsTable">
-            @foreach($students as $student)
-            <tr class="border-b hover:bg-gray-50">
-                <td class="p-3">{{ $student->full_name }}</td>
-                <td class="p-3">{{ $student->email ?? '-' }}</td>
-                <td class="p-3">{{ $student->phone }}</td>
-                <td class="p-3">{{ $student->course_interest }}</td>
-                <td class="p-3">
-                    <span class="px-2 py-1 rounded text-sm
-                        {{ $student->status == 'active' ? 'bg-green-100 text-green-700' : ($student->status=='pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') }}">
-                        {{ ucfirst($student->status) }}
-                    </span>
-                </td>
-                <td class="p-3">{{ $student->created_at->format('d M Y') }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-
+{{-- Page Header --}}
+<div class="ad-page-hd">
+    <div class="ad-page-hd-left">
+        <h1>Students</h1>
+        <nav class="ad-breadcrumb">
+            <a href="{{ route('admin.dashboard') }}">Dashboard</a>
+            <i class="fas fa-chevron-right"></i>
+            <span>Students</span>
+        </nav>
+    </div>
+    <div style="font-size:0.8125rem;color:var(--ad-muted);align-self:center;">
+        {{ $students->total() }} total records
+    </div>
 </div>
 
-<script>
-function filterTable(value) {
-    value = value.toLowerCase();
-    document.querySelectorAll('#studentsTable tr').forEach(row => {
-        row.style.display = row.innerText.toLowerCase().includes(value)
-            ? ''
-            : 'none';
-    });
-}
-</script>
+{{-- Session Alerts --}}
+@if(session('success'))
+<div class="ad-alert ad-alert-success">
+    <i class="fas fa-check-circle"></i>
+    {{ session('success') }}
+    <button class="ad-alert-close" type="button"><i class="fas fa-times"></i></button>
+</div>
+@endif
+@if(session('error'))
+<div class="ad-alert ad-alert-error">
+    <i class="fas fa-exclamation-circle"></i>
+    {{ session('error') }}
+    <button class="ad-alert-close" type="button"><i class="fas fa-times"></i></button>
+</div>
+@endif
+
+{{-- Students Table Card --}}
+<div class="ad-card">
+    <div class="ad-table-toolbar">
+        <div class="ad-search-box">
+            <i class="fas fa-search"></i>
+            <input class="ad-table-search" data-table="studentsTable" placeholder="Search students...">
+        </div>
+    </div>
+    <div class="ad-table-wrap">
+        <table class="ad-table" id="studentsTable">
+            <thead>
+                <tr>
+                    <th class="cell-sm">#</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Course Interest</th>
+                    <th>Status</th>
+                    <th>Applied</th>
+                    <th class="cell-action">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($students as $student)
+                <tr>
+                    <td>{{ $students->firstItem() + $loop->index }}</td>
+                    <td>{{ $student->full_name }}</td>
+                    <td>{{ $student->email ?? '-' }}</td>
+                    <td>{{ $student->phone ?? '-' }}</td>
+                    <td>{{ $student->course_interest ?? '-' }}</td>
+                    <td>
+                        @php $st = $student->status ?? 'pending'; @endphp
+                        <span class="ad-badge
+                            {{ $st === 'active' ? 'ad-badge-active' : ($st === 'rejected' ? 'ad-badge-rejected' : 'ad-badge-pending') }}">
+                            {{ ucfirst($st) }}
+                        </span>
+                    </td>
+                    <td>{{ $student->created_at->format('M d, Y') }}</td>
+                    <td>
+                        <a href="{{ route('admin.students.show', $student->id) }}"
+                           class="btn-ad btn-ad-outline btn-ad-sm">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="8" class="ad-table-empty">
+                        <i class="fas fa-user-graduate"></i>
+                        No students found.
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    @if($students->hasPages())
+    <div style="padding:12px 16px;border-top:1px solid var(--ad-border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <span style="font-size:0.75rem;color:var(--ad-muted);">
+            Showing {{ $students->firstItem() }}–{{ $students->lastItem() }} of {{ $students->total() }} records
+        </span>
+        {{ $students->links() }}
+    </div>
+    @endif
+</div>
+
 @endsection

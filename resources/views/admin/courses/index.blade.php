@@ -1,55 +1,101 @@
 @extends('layouts.admin')
+@section('title', 'Courses')
 
 @section('content')
-<div class="p-6">
-    <div class="flex justify-between items-center mb-4">
-        <h1 class="text-2xl font-bold">Courses</h1>
-        <a href="{{ route('admin.courses.create') }}"
-           class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add New Course</a>
+
+{{-- Page Header --}}
+<div class="ad-page-hd">
+    <div class="ad-page-hd-left">
+        <h1>Courses</h1>
+        <nav class="ad-breadcrumb">
+            <a href="{{ route('admin.dashboard') }}">Dashboard</a>
+            <i class="fas fa-chevron-right"></i>
+            <span>Courses</span>
+        </nav>
     </div>
-
-    @if(session('success'))
-        <div class="bg-green-100 text-green-800 p-2 rounded mb-4">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    <table class="min-w-full bg-white border rounded">
-        <thead class="bg-gray-100">
-            <tr>
-                <th class="px-4 py-2 border">Title</th>
-                <th class="px-4 py-2 border">Category</th>
-                <th class="px-4 py-2 border">Fee (UGX)</th>
-                <th class="px-4 py-2 border">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($courses as $course)
-            <tr class="text-center">
-                <td class="px-4 py-2 border">{{ $course->title }}</td>
-                <td class="px-4 py-2 border">{{ $course->category }}</td>
-                <td class="px-4 py-2 border">{{ $course->fee ?? 'N/A' }}</td>
-                <td class="px-4 py-2 border flex justify-center gap-2">
-                    <a href="{{ route('admin.courses.edit', $course->id) }}"
-                       class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">Edit</a>
-
-                    <form action="{{ route('admin.courses.destroy', $course->id) }}" method="POST"
-                          onsubmit="return confirm('Are you sure you want to delete this course?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit"
-                                class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700">
-                            Delete
-                        </button>
-                    </form>
-                </td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="4" class="px-4 py-2 border text-center">No courses found.</td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
+    <a href="{{ route('admin.courses.create') }}" class="btn-ad btn-ad-primary">
+        <i class="fas fa-plus"></i> Add Course
+    </a>
 </div>
+
+{{-- Session Alerts --}}
+@if(session('success'))
+<div class="ad-alert ad-alert-success">
+    <i class="fas fa-check-circle"></i>
+    {{ session('success') }}
+    <button class="ad-alert-close" type="button"><i class="fas fa-times"></i></button>
+</div>
+@endif
+@if(session('error'))
+<div class="ad-alert ad-alert-error">
+    <i class="fas fa-exclamation-circle"></i>
+    {{ session('error') }}
+    <button class="ad-alert-close" type="button"><i class="fas fa-times"></i></button>
+</div>
+@endif
+
+{{-- Courses Table Card --}}
+<div class="ad-card">
+    <div class="ad-table-toolbar">
+        <div class="ad-search-box">
+            <i class="fas fa-search"></i>
+            <input class="ad-table-search" data-table="coursesTable" placeholder="Search courses...">
+        </div>
+    </div>
+    <div class="ad-table-wrap">
+        <table class="ad-table" id="coursesTable">
+            <thead>
+                <tr>
+                    <th class="cell-sm">#</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Fee (UGX)</th>
+                    <th class="cell-action">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($courses as $course)
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $course->title }}</td>
+                    <td>{{ $course->category ?? '-' }}</td>
+                    <td>
+                        @if($course->fee)
+                            UGX {{ number_format($course->fee, 0) }}
+                        @else
+                            <span style="color:var(--ad-muted);">Free</span>
+                        @endif
+                    </td>
+                    <td>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            <a href="{{ route('admin.courses.edit', $course->id) }}"
+                               class="btn-ad btn-ad-outline btn-ad-sm">
+                                <i class="fas fa-pen"></i> Edit
+                            </a>
+                            <form action="{{ route('admin.courses.destroy', $course->id) }}"
+                                  method="POST" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="button"
+                                        class="btn-ad btn-ad-danger btn-ad-sm"
+                                        data-confirm-delete>
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="5" class="ad-table-empty">
+                        <i class="fas fa-book-open"></i>
+                        No courses found. <a href="{{ route('admin.courses.create') }}" style="color:var(--ad-primary);">Add a course</a>
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
+
 @endsection

@@ -26,4 +26,14 @@ class Student extends Model
         'agreed_terms' => 'boolean',
         'dob'          => 'date',
     ];
+
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
 }
