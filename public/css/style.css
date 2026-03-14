@@ -232,7 +232,7 @@ main { display: block; width: 100%; overflow-x: hidden; }
 ---------------------------------------------------------------- */
 .hero {
     background-color: var(--primary);
-    background-image: url('../images/hero-bg.jpg');
+    /* background-image: url('../images/hero-bg.jpg'); — upload image to public/images/ to enable */
     background-size: cover;
     background-position: center;
     background-blend-mode: multiply;
