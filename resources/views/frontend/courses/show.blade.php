@@ -1,7 +1,7 @@
 @extends('layouts.frontend')
 
 @section('title', $course->title . ' | DevRoots Academy')
-@section('meta_description', Str::limit($course->description, 160))
+@section('meta_description', Str::limit(strip_tags($course->description), 160))
 
 @section('content')
 
@@ -69,7 +69,7 @@
 
         {{-- Course Description --}}
         <div class="course-desc-card mb-4">
-            <p style="margin:0;font-size:0.9375rem;">{{ $course->description }}</p>
+            <div style="font-size:0.9375rem;">{!! $course->description !!}</div>
         </div>
 
         {{-- Details Grid --}}
