@@ -75,19 +75,19 @@
 
                     <div class="bp-stats">
                         <div class="bps-item">
-                            <span class="bps-num">500+</span>
+                            <span class="bps-num">{{ $siteStats['students'] >= 500 ? '500+' : $siteStats['students'] }}</span>
                             <span class="bps-lbl">Students</span>
                         </div>
                         <div class="bps-item">
-                            <span class="bps-num">12+</span>
+                            <span class="bps-num">{{ $siteStats['courses'] >= 12 ? '12+' : $siteStats['courses'] }}</span>
                             <span class="bps-lbl">Courses</span>
                         </div>
                         <div class="bps-item">
-                            <span class="bps-num">95%</span>
+                            <span class="bps-num">{{ $siteStats['satisfaction'] }}%</span>
                             <span class="bps-lbl">Satisfaction</span>
                         </div>
                         <div class="bps-item">
-                            <span class="bps-num">8+</span>
+                            <span class="bps-num">{{ $siteStats['partners'] }}+</span>
                             <span class="bps-lbl">Partners</span>
                         </div>
                     </div>
@@ -218,16 +218,7 @@
                                                 class="form-select @error('course_interest') is-invalid @enderror"
                                                 required>
                                             <option value="">Choose your course of interest</option>
-                                            @foreach([
-                                                'Programming Fundamentals',
-                                                'Web Development',
-                                                'AI & Machine Learning',
-                                                'Mobile App Development',
-                                                'Cloud Computing',
-                                                'Networking Essentials',
-                                                'Computer Repair & Maintenance',
-                                                'Internet of Things (IoT)',
-                                            ] as $course)
+                                            @foreach($courses as $course)
                                                 <option value="{{ $course }}"
                                                     {{ old('course_interest') === $course ? 'selected' : '' }}>
                                                     {{ $course }}
@@ -265,7 +256,7 @@
                                        {{ old('terms') ? 'checked' : '' }} required>
                                 <label class="form-check-label" for="terms">
                                     I agree to the
-                                    <a href="{{ route('contact') }}" class="text-primary">terms &amp; conditions</a>.
+                                    <a href="{{ route('terms') }}" class="text-primary">terms &amp; conditions</a>.
                                 </label>
                                 @error('terms')
                                     <div class="invalid-feedback">{{ $message }}</div>

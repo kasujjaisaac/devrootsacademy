@@ -2,11 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
 use Illuminate\Http\Request;
 use App\Models\Student;
 
 class FrontendStudentController extends Controller
 {
+    public function showForm()
+    {
+        $courses = Course::where('is_active', true)->orderBy('title')->pluck('title', 'title');
+        return view('frontend.apply-now', compact('courses'));
+    }
+
     public function submitApplication(Request $request)
     {
         $validated = $request->validate([
@@ -20,12 +27,12 @@ class FrontendStudentController extends Controller
             'goals'           => 'nullable|string|max:2000',
             'terms'           => 'accepted',
         ], [
-            'username.unique'  => 'This username is already taken. Please choose another.',
-            'email.unique'     => 'This email address has already been used for an application.',
-            'phone.unique'     => 'This phone number has already been used for an application.',
-            'dob.before'       => 'Date of birth must be in the past.',
-            'terms.accepted'   => 'You must agree to the terms and conditions to apply.',
-            'course_interest.required' => 'Please select a course you are interested in.',
+            'username.unique'           => 'This username is already taken. Please choose another.',
+            'email.unique'              => 'This email address has already been used for an application.',
+            'phone.unique'              => 'This phone number has already been used for an application.',
+            'dob.before'                => 'Date of birth must be in the past.',
+            'terms.accepted'            => 'You must agree to the terms and conditions to apply.',
+            'course_interest.required'  => 'Please select a course you are interested in.',
         ]);
 
         Student::create([

@@ -5,29 +5,17 @@
 
             {{-- Column 1: Brand --}}
             <div class="col-lg-4 col-md-6">
-                <img src="{{ asset('images/logo-horizontal.png') }}"
-                     alt="DevRoots Academy"
-                     class="footer-brand-logo">
+                <img src="{{ asset('images/logo-horizontal.png') }}" alt="DevRoots Academy" class="footer-brand-logo">
                 <p class="footer-tagline">
                     Empowering IT innovators in Masaka with practical, hands-on tech education.
                     Learn programming, hardware repair, networking, and more.
                 </p>
                 <div class="footer-social">
-                    <a href="#" target="_blank" rel="noopener" aria-label="Facebook">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a href="#" target="_blank" rel="noopener" aria-label="Twitter / X">
-                        <i class="fab fa-x-twitter"></i>
-                    </a>
-                    <a href="#" target="_blank" rel="noopener" aria-label="LinkedIn">
-                        <i class="fab fa-linkedin-in"></i>
-                    </a>
-                    <a href="#" target="_blank" rel="noopener" aria-label="Instagram">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="#" target="_blank" rel="noopener" aria-label="YouTube">
-                        <i class="fab fa-youtube"></i>
-                    </a>
+                    <a href="https://facebook.com/devroots" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://x.com/devroots" target="_blank" rel="noopener" aria-label="Twitter / X"><i class="fab fa-x-twitter"></i></a>
+                    <a href="https://linkedin.com/company/devroots" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://instagram.com/devroots" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://youtube.com/@devroots" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
                 </div>
             </div>
 
@@ -58,7 +46,6 @@
             {{-- Column 4: Contact + Newsletter --}}
             <div class="col-lg-4 col-md-6">
                 <h4 class="footer-heading">Contact Us</h4>
-
                 <div class="footer-contact-item">
                     <i class="fas fa-map-marker-alt"></i>
                     <span>Masaka City, Uganda</span>
@@ -77,17 +64,21 @@
                 </div>
 
                 <h4 class="footer-heading mt-4">Newsletter</h4>
-                <form id="newsletterForm" class="footer-newsletter" novalidate>
+                @if(session('newsletter_success'))
+                    <p style="color:#4caf50;font-size:0.875rem;margin-bottom:8px;">
+                        <i class="fas fa-check-circle me-1"></i>{{ session('newsletter_success') }}
+                    </p>
+                @endif
+                <form action="{{ route('newsletter.subscribe') }}" method="POST" class="footer-newsletter">
                     @csrf
                     <div class="input-group">
-                        <input type="email"
-                               name="email"
-                               class="form-control"
-                               placeholder="Your email address"
-                               required
-                               aria-label="Email address">
+                        <input type="email" name="email" class="form-control"
+                               placeholder="Your email address" required aria-label="Email address">
                         <button type="submit" class="btn-subscribe">Subscribe</button>
                     </div>
+                    @error('email')
+                        <small style="color:#e57373;">{{ $message }}</small>
+                    @enderror
                 </form>
             </div>
 
@@ -99,8 +90,8 @@
             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                 <p>&copy; {{ date('Y') }} DevRoots Academy. All rights reserved.</p>
                 <div class="d-flex gap-3">
-                    <a href="{{ route('contact') }}">Privacy Policy</a>
-                    <a href="{{ route('contact') }}">Terms &amp; Conditions</a>
+                    <a href="{{ route('privacy') }}">Privacy Policy</a>
+                    <a href="{{ route('terms') }}">Terms &amp; Conditions</a>
                 </div>
             </div>
         </div>

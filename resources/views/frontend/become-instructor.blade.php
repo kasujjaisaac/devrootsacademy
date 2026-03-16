@@ -75,19 +75,19 @@
 
                     <div class="bp-stats">
                         <div class="bps-item">
-                            <span class="bps-num">500+</span>
+                            <span class="bps-num">{{ $siteStats['students'] >= 500 ? '500+' : $siteStats['students'] }}</span>
                             <span class="bps-lbl">Students</span>
                         </div>
                         <div class="bps-item">
-                            <span class="bps-num">12+</span>
+                            <span class="bps-num">{{ $siteStats['courses'] >= 12 ? '12+' : $siteStats['courses'] }}</span>
                             <span class="bps-lbl">Courses</span>
                         </div>
                         <div class="bps-item">
-                            <span class="bps-num">8+</span>
+                            <span class="bps-num">{{ $siteStats['partners'] }}+</span>
                             <span class="bps-lbl">Partners</span>
                         </div>
                         <div class="bps-item">
-                            <span class="bps-num">95%</span>
+                            <span class="bps-num">{{ $siteStats['satisfaction'] }}%</span>
                             <span class="bps-lbl">Satisfaction</span>
                         </div>
                     </div>
@@ -202,20 +202,18 @@
                                                 class="form-select @error('expertise') is-invalid @enderror"
                                                 required>
                                             <option value="">Select your expertise</option>
-                                            @foreach([
-                                                'Programming',
-                                                'Web Development',
-                                                'AI & Machine Learning',
-                                                'Networking',
-                                                'Hardware Repair',
-                                                'Cloud Computing',
-                                                'Mobile App Development',
-                                            ] as $area)
-                                                <option value="{{ $area }}"
-                                                    {{ old('expertise') === $area ? 'selected' : '' }}>
-                                                    {{ $area }}
+                                            @forelse($categories as $cat)
+                                                <option value="{{ $cat }}"
+                                                    {{ old('expertise') === $cat ? 'selected' : '' }}>
+                                                    {{ $cat }}
                                                 </option>
-                                            @endforeach
+                                            @empty
+                                                <option value="Programming">Programming</option>
+                                                <option value="Web Development">Web Development</option>
+                                                <option value="Networking">Networking</option>
+                                                <option value="Hardware Repair">Hardware Repair</option>
+                                                <option value="Cloud Computing">Cloud Computing</option>
+                                            @endforelse
                                         </select>
                                         @error('expertise')
                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -255,6 +253,19 @@
 
                         {{-- Submit area --}}
                         <div class="submit-area">
+                            <div class="form-check">
+                                <input type="checkbox" id="terms" name="terms"
+                                       class="form-check-input @error('terms') is-invalid @enderror"
+                                       {{ old('terms') ? 'checked' : '' }} required>
+                                <label class="form-check-label" for="terms">
+                                    I agree to the
+                                    <a href="{{ route('terms') }}" class="text-primary">terms &amp; conditions</a>.
+                                </label>
+                                @error('terms')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
                             <button type="submit" class="btn btn-primary w-100 btn-lg">
                                 <i class="fas fa-paper-plane me-2"></i>Submit Application
                             </button>

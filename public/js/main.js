@@ -95,16 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ------------------------------
-  // NEWSLETTER FORM
-  // ------------------------------
-  const newsletterForm = qs("#newsletterForm");
-  newsletterForm?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    alert("Thank you for subscribing to our newsletter!");
-    newsletterForm.reset();
-  });
-
-  // ------------------------------
   // SCROLL-TRIGGERED FADE-IN
   // ------------------------------
   const scrollEls = qsa(".course-card, .why-item, .partner-logo-card");

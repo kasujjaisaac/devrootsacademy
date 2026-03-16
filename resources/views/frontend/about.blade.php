@@ -132,6 +132,41 @@
     </div>
 </section>
 
+{{-- ===== INSTRUCTORS ===== --}}
+@if($instructors->isNotEmpty())
+<section class="section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="section-label">The People Behind DevRoots</span>
+            <h2 class="section-title">Meet Our Instructors</h2>
+            <span class="title-bar centered"></span>
+        </div>
+        <div class="row g-4 justify-content-center">
+            @foreach($instructors as $instructor)
+            <div class="col-sm-6 col-lg-4">
+                <div class="why-item h-100 text-center">
+                    <div class="why-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h4>{{ $instructor->full_name }}</h4>
+                    <p class="mb-1 text-primary fw-semibold" style="font-size:0.85rem;">{{ $instructor->expertise }}</p>
+                    @if($instructor->experience_years)
+                        <p class="mb-2" style="font-size:0.8rem; color:var(--text-muted);">{{ $instructor->experience_years }} years experience</p>
+                    @endif
+                    <p class="mb-0" style="font-size:0.9rem;">{{ Str::limit($instructor->bio, 120) }}</p>
+                    @if($instructor->portfolio)
+                        <a href="{{ $instructor->portfolio }}" target="_blank" rel="noopener" class="mt-2 d-inline-block text-primary" style="font-size:0.85rem;">
+                            <i class="fas fa-external-link-alt me-1"></i>Portfolio
+                        </a>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
 {{-- ===== CONTACT INFO ===== --}}
 <section class="section">
     <div class="container">
