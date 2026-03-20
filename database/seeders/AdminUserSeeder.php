@@ -14,7 +14,6 @@ class AdminUserSeeder extends Seeder
             ['email' => 'admin@devroots.ac.ug'],
             [
                 'name'     => 'DevRoots Admin',
-                'username' => 'devroots_admin',
                 'password' => Hash::make('Admin@DevRoots2025!'),
                 'is_admin' => true,
                 'role'     => 'admin',

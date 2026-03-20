@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class CourseController extends Controller
 {
     public function index()
     {
-        $courses = Course::all();
+        $courses = Course::latest()->get();
         return view('admin.courses.index', compact('courses'));
     }
 
@@ -36,26 +38,38 @@ class CourseController extends Controller
             'mode'              => 'nullable|in:online,in-person,hybrid',
         ]);
 
-        $path = $request->file('image')->store('courses', 'public');
+        try {
+            $path = $request->file('image')->store('courses', 'public');
 
-        Course::create([
-            'title'             => $request->title,
-            'slug'              => $request->slug,
-            'category'          => $request->category,
-            'description'       => $request->description,
-            'short_description' => $request->short_description,
-            'image'             => $path,
-            'fee'               => $request->fee !== null ? (int) $request->fee : null,
-            'outline'           => $request->outline
-                ? array_values(array_filter(array_map('trim', explode("\n", $request->outline))))
-                : [],
-            'level'             => $request->level,
-            'duration_weeks'    => $request->duration_weeks,
-            'schedule'          => $request->schedule,
-            'mode'              => $request->mode,
-            'is_featured'       => $request->input('is_featured', '0') === '1',
-            'is_active'         => $request->input('is_active', '1') === '1',
-        ]);
+            Course::create([
+                'title'             => $request->title,
+                'slug'              => $request->slug,
+                'category'          => $request->category,
+                'description'       => $request->description,
+                'short_description' => $request->short_description,
+                'image'             => $path,
+                'fee'               => $request->fee !== null ? (int) $request->fee : null,
+                'outline'           => $request->outline
+                    ? array_values(array_filter(array_map('trim', explode("\n", $request->outline))))
+                    : [],
+                'level'             => $request->level,
+                'duration_weeks'    => $request->duration_weeks,
+                'schedule'          => $request->schedule,
+                'mode'              => $request->mode,
+                'is_featured'       => $request->boolean('is_featured'),
+                'is_active'         => $request->boolean('is_active'),
+            ]);
+        } catch (Throwable $e) {
+            if (isset($path) && Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
+
+            report($e);
+
+            return back()
+                ->withInput()
+                ->with('error', 'The course could not be saved. Check the database connection and try again.');
+        }
 
         return redirect()->route('admin.courses.index')
             ->with('success', 'Course created successfully.');
@@ -97,18 +111,27 @@ class CourseController extends Controller
             'duration_weeks'    => $request->duration_weeks,
             'schedule'          => $request->schedule,
             'mode'              => $request->mode,
-            'is_featured'       => $request->input('is_featured', '0') === '1',
-            'is_active'         => $request->input('is_active', '0') === '1',
+            'is_featured'       => $request->boolean('is_featured'),
+            'is_active'         => $request->boolean('is_active'),
         ];
 
-        if ($request->hasFile('image')) {
-            if ($course->image && \Storage::disk('public')->exists($course->image)) {
-                \Storage::disk('public')->delete($course->image);
-            }
-            $data['image'] = $request->file('image')->store('courses', 'public');
-        }
+        try {
+            if ($request->hasFile('image')) {
+                if ($course->image && Storage::disk('public')->exists($course->image)) {
+                    Storage::disk('public')->delete($course->image);
+                }
 
-        $course->update($data);
+                $data['image'] = $request->file('image')->store('courses', 'public');
+            }
+
+            $course->update($data);
+        } catch (Throwable $e) {
+            report($e);
+
+            return back()
+                ->withInput()
+                ->with('error', 'The course could not be updated. Check the database connection and try again.');
+        }
 
         return redirect()->route('admin.courses.index')
             ->with('success', 'Course updated successfully.');
@@ -116,8 +139,8 @@ class CourseController extends Controller
 
     public function destroy(Course $course)
     {
-        if ($course->image && \Storage::disk('public')->exists($course->image)) {
-            \Storage::disk('public')->delete($course->image);
+        if ($course->image && Storage::disk('public')->exists($course->image)) {
+            Storage::disk('public')->delete($course->image);
         }
         $course->delete();
 

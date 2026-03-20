@@ -103,18 +103,14 @@
         <div class="courses-grid-hp">
             @forelse($courses as $course)
                 <x-frontend.course-card
-                    :image="$course->image ? 'storage/' . $course->image : 'images/courses/programming.png'"
+                    :image="$course->image ? asset('storage/' . $course->image) : asset('images/courses/programming.png')"
                     :title="$course->title"
                     :desc="$course->short_description ?: Str::limit($course->description, 100)"
                     :duration="$course->duration_weeks ? $course->duration_weeks . ' Weeks' : ''"
                     :level="$course->level ?: ''"
                     :slug="$course->slug" />
             @empty
-                {{-- Fallback static cards if DB is empty --}}
-                <x-frontend.course-card image="images/courses/programming.png" title="Programming Fundamentals" desc="Learn logic, problem-solving, and Python basics through hands-on coding." duration="8 Weeks" level="Beginner" slug="programming-fundamentals" />
-                <x-frontend.course-card image="images/courses/web-development.png" title="Web Development" desc="Build modern, responsive websites using HTML, CSS, JavaScript, and Git." duration="12 Weeks" level="Intermediate" slug="web-development" />
-                <x-frontend.course-card image="images/courses/hardware.png" title="Computer Repair &amp; Maintenance" desc="Diagnose, repair, and maintain computers with real hands-on lab practice." duration="10 Weeks" level="Beginner" slug="computer-repair-maintenance" />
-                <x-frontend.course-card image="images/courses/networking.png" title="Networking Essentials" desc="Learn networking fundamentals, protocols, and hands-on configuration skills." duration="10 Weeks" level="Beginner" slug="networking-essentials" />
+                <p class="no-courses text-center">No active courses are available yet.</p>
             @endforelse
         </div>
 

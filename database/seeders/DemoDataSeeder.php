@@ -89,7 +89,17 @@ class DemoDataSeeder extends Seeder
 
         $courseModels = [];
         foreach ($courses as $data) {
-            $courseModels[] = Course::firstOrCreate(['slug' => $data['slug']], $data);
+            $normalized = [
+                'title' => $data['title'] ?? $data['name'],
+                'slug' => $data['slug'],
+                'category' => $data['category'],
+                'description' => $data['description'],
+                'image' => $data['image'] ?? 'courses/default.jpg',
+                'fee' => $data['fee'] ?? null,
+                'outline' => $data['outline'] ?? ($data['weekly_outline'] ?? null),
+            ];
+
+            $courseModels[] = Course::firstOrCreate(['slug' => $normalized['slug']], $normalized);
         }
 
         // ─────────────────────────────────────────────
@@ -256,18 +266,18 @@ class DemoDataSeeder extends Seeder
             $student = $studentModels[$row['student']];
             $course  = $courseModels[$row['course']];
             $date    = Carbon::create(2025, $row['month'], rand(1, 25));
-            $ref     = 'REF-' . strtoupper(substr(md5($i . $date), 0, 8));
 
             Payment::firstOrCreate(
-                ['reference' => $ref],
+                [
+                    'student_id' => $student->id,
+                    'course_id' => $course->id,
+                    'amount' => $row['amount'],
+                ],
                 [
                     'student_id' => $student->id,
                     'course_id'  => $course->id,
                     'amount'     => $row['amount'],
-                    'method'     => $row['method'],
-                    'status'     => $row['status'],
-                    'reference'  => $ref,
-                    'paid_at'    => $row['status'] === 'paid' ? $date : null,
+                    'payment_method' => $row['method'],
                     'created_at' => $date,
                     'updated_at' => $date,
                 ]
@@ -286,11 +296,11 @@ class DemoDataSeeder extends Seeder
             if ($chatUsers->count() < 2) {
                 $chatUsers = collect([
                     User::firstOrCreate(['email' => 'alice.chat@example.com'], [
-                        'name' => 'Alice Namukasa', 'username' => 'alice_chat',
+                        'name' => 'Alice Namukasa',
                         'password' => bcrypt('password'), 'is_admin' => false, 'role' => 'student',
                     ]),
                     User::firstOrCreate(['email' => 'david.chat@example.com'], [
-                        'name' => 'David Kato', 'username' => 'david_chat',
+                        'name' => 'David Kato',
                         'password' => bcrypt('password'), 'is_admin' => false, 'role' => 'student',
                     ]),
                 ]);

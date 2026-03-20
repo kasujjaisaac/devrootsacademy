@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -15,16 +14,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Default seeding is production-safe: create only the admin account.
+        // Run `php artisan db:seed --class=DemoDataSeeder` manually if demo data is ever needed.
         $this->call([
             AdminUserSeeder::class,
-            DemoDataSeeder::class,
         ]);
-
     }
 }

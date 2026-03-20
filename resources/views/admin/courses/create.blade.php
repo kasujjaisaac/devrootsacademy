@@ -201,6 +201,12 @@
 </div>
 
 {{-- Validation Errors --}}
+@if(session('error'))
+<div class="ad-alert ad-alert-error">
+    <i class="fas fa-exclamation-circle"></i>
+    <div>{{ session('error') }}</div>
+</div>
+@endif
 @if($errors->any())
 <div class="ad-alert ad-alert-error">
     <i class="fas fa-exclamation-circle"></i>
@@ -298,7 +304,8 @@
                 <div class="ad-form-group" style="margin-bottom:0;">
                     <label class="ad-label">Full Description <span class="required">*</span></label>
                     <div id="descEditor">{{ old('description') }}</div>
-                    <textarea name="description" id="descInput" hidden required>{{ old('description') }}</textarea>
+                    <textarea name="description" id="descInput" hidden>{{ old('description') }}</textarea>
+                    <p class="ad-error" id="descClientError" hidden>Please add a course description.</p>
                     @error('description')<p class="ad-error">{{ $message }}</p>@enderror
                     <p class="ad-input-hint">Use the toolbar for headings, lists, links, and formatting.</p>
                 </div>
@@ -474,9 +481,25 @@ if (existingDesc) {
     quill.clipboard.dangerouslyPasteHTML(existingDesc);
 }
 
-// Sync to hidden textarea on submit
-document.getElementById('courseForm').addEventListener('submit', function () {
-    document.getElementById('descInput').value = quill.root.innerHTML;
+const courseForm = document.getElementById('courseForm');
+const descInput = document.getElementById('descInput');
+const descClientError = document.getElementById('descClientError');
+
+function syncDescription() {
+    descInput.value = quill.root.innerHTML;
+    descClientError.hidden = true;
+}
+
+quill.on('text-change', syncDescription);
+syncDescription();
+
+courseForm.addEventListener('submit', function (e) {
+    syncDescription();
+
+    if (!quill.getText().trim()) {
+        e.preventDefault();
+        descClientError.hidden = false;
+    }
 });
 
 /* ── Auto-generate Slug ──────────────────────────────── */

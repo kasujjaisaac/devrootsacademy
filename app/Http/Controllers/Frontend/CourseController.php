@@ -13,23 +13,30 @@ class CourseController extends Controller
     {
         $category = $request->category;
 
-        $courses = Course::when($category, function($query, $category) {
+        $courses = Course::where('is_active', true)
+        ->when($category, function($query, $category) {
             $query->where('category', $category);
         })
+        ->orderByDesc('is_featured')
         ->orderBy('created_at', 'desc')
-        ->paginate(9) // 9 courses per page
-        ->withQueryString(); // keep filter in pagination links
+        ->paginate(9)
+        ->withQueryString();
 
-        // Sidebar categories
-        $categories = Course::select('category')->distinct()->get();
+        $categories = Course::where('is_active', true)
+            ->whereNotNull('category')
+            ->select('category')
+            ->distinct()
+            ->orderBy('category')
+            ->get();
 
         return view('frontend.courses.index', compact('courses', 'categories'));
     }
 
-    // Show single course
     public function show($slug)
     {
-        $course = Course::where('slug', $slug)->firstOrFail();
+        $course = Course::where('is_active', true)
+            ->where('slug', $slug)
+            ->firstOrFail();
         return view('frontend.courses.show', compact('course'));
     }
 }

@@ -54,14 +54,8 @@
                              loading="lazy">
                     </div>
                     <div class="course-card-body">
-                        <div class="course-meta-tags">
-                            <span class="badge-primary">{{ $course->category }}</span>
-                            @if($course->level)
-                                <span class="badge-outline ms-1">{{ $course->level }}</span>
-                            @endif
-                        </div>
                         <h3>{{ $course->title }}</h3>
-                        <p>{{ Str::limit($course->description, 110) }}</p>
+                        <p>{{ $course->short_description ?: Str::limit(strip_tags($course->description), 110) }}</p>
                         <div class="d-flex align-items-center justify-content-between mt-auto mb-3 flex-wrap gap-1">
                             @if($course->duration_weeks)
                                 <small style="color:var(--text-muted);"><i class="fas fa-clock me-1"></i>{{ $course->duration_weeks }} weeks</small>

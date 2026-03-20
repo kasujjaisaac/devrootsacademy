@@ -204,6 +204,13 @@
     <button class="ad-alert-close" type="button"><i class="fas fa-times"></i></button>
 </div>
 @endif
+@if(session('error'))
+<div class="ad-alert ad-alert-error">
+    <i class="fas fa-exclamation-circle"></i>
+    <div>{{ session('error') }}</div>
+    <button class="ad-alert-close" type="button"><i class="fas fa-times"></i></button>
+</div>
+@endif
 @if($errors->any())
 <div class="ad-alert ad-alert-error">
     <i class="fas fa-exclamation-circle"></i>
@@ -301,7 +308,8 @@
                 <div class="ad-form-group" style="margin-bottom:0;">
                     <label class="ad-label">Full Description <span class="required">*</span></label>
                     <div id="descEditor"></div>
-                    <textarea name="description" id="descInput" hidden required>{{ old('description', $course->description) }}</textarea>
+                    <textarea name="description" id="descInput" hidden>{{ old('description', $course->description) }}</textarea>
+                    <p class="ad-error" id="descClientError" hidden>Please add a course description.</p>
                     @error('description')<p class="ad-error">{{ $message }}</p>@enderror
                     <p class="ad-input-hint">Use the toolbar for headings, lists, links, and formatting.</p>
                 </div>
@@ -496,8 +504,25 @@ if (existingDesc) {
     }
 }
 
-document.getElementById('courseForm').addEventListener('submit', function () {
-    document.getElementById('descInput').value = quill.root.innerHTML;
+const courseForm = document.getElementById('courseForm');
+const descInput = document.getElementById('descInput');
+const descClientError = document.getElementById('descClientError');
+
+function syncDescription() {
+    descInput.value = quill.root.innerHTML;
+    descClientError.hidden = true;
+}
+
+quill.on('text-change', syncDescription);
+syncDescription();
+
+courseForm.addEventListener('submit', function (e) {
+    syncDescription();
+
+    if (!quill.getText().trim()) {
+        e.preventDefault();
+        descClientError.hidden = false;
+    }
 });
 
 /* ── Auto-generate Slug ──────────────────────────────── */
