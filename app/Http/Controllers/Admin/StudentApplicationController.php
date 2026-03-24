@@ -77,17 +77,42 @@ class StudentApplicationController extends Controller
             'review_notes' => 'nullable|string|max:5000',
         ]);
 
-        $studentApplication->update([
-            'status' => StudentApplication::STATUS_ACCEPTED,
-            'review_notes' => $validated['review_notes'] ?? $studentApplication->review_notes,
-            'reviewed_by' => Auth::id(),
-            'reviewed_at' => $studentApplication->reviewed_at ?: now(),
-            'decision_at' => now(),
-        ]);
+        DB::transaction(function () use ($studentApplication, $validated) {
+            $student = $studentApplication->student;
 
-        $this->sendEmailIfPossible($studentApplication->fresh(['course']), new StudentApplicationAcceptedMail($studentApplication->fresh(['course'])));
+            if (! $student) {
+                $student = Student::create([
+                    'student_number' => Student::generateStudentNumber(),
+                    'full_name' => $studentApplication->full_name,
+                    'username' => $studentApplication->username,
+                    'email' => $studentApplication->email,
+                    'phone' => $studentApplication->phone,
+                    'dob' => $studentApplication->dob,
+                    'location' => $studentApplication->location,
+                    'course_interest' => $studentApplication->course?->title,
+                    'goals' => $studentApplication->goals,
+                    'agreed_terms' => $studentApplication->agreed_terms,
+                    'status' => 'pending',
+                ]);
+            } elseif (! $student->student_number) {
+                $student->update([
+                    'student_number' => Student::generateStudentNumber(),
+                ]);
+            }
 
-        return back()->with('success', 'Application accepted.');
+            $studentApplication->update([
+                'status' => StudentApplication::STATUS_ACCEPTED,
+                'review_notes' => $validated['review_notes'] ?? $studentApplication->review_notes,
+                'reviewed_by' => Auth::id(),
+                'reviewed_at' => $studentApplication->reviewed_at ?: now(),
+                'decision_at' => now(),
+                'student_id' => $student->id,
+            ]);
+        });
+
+        $this->sendEmailIfPossible($studentApplication->fresh(['course', 'student']), new StudentApplicationAcceptedMail($studentApplication->fresh(['course', 'student'])));
+
+        return back()->with('success', 'Application accepted and student number assigned.');
     }
 
     public function reject(Request $request, StudentApplication $studentApplication)
@@ -138,6 +163,7 @@ class StudentApplicationController extends Controller
 
             $student = $studentApplication->student ?: Student::create([
                 'user_id' => $user->id,
+                'student_number' => Student::generateStudentNumber(),
                 'full_name' => $studentApplication->full_name,
                 'username' => $studentApplication->username,
                 'email' => $studentApplication->email,
@@ -152,6 +178,10 @@ class StudentApplicationController extends Controller
 
             if (! $student->user_id) {
                 $student->update(['user_id' => $user->id]);
+            }
+
+            if (! $student->student_number) {
+                $student->update(['student_number' => Student::generateStudentNumber()]);
             }
 
             $enrollment = $studentApplication->enrollment ?: Enrollment::firstOrCreate(

@@ -9,6 +9,7 @@
     <div class="sp-card">
         <h3>Student Information</h3>
         <div class="sp-list">
+            <div class="sp-list-item"><span class="sp-muted">Student Number</span><strong>{{ $student->student_number ?? 'Pending assignment' }}</strong></div>
             <div class="sp-list-item"><span class="sp-muted">Full Name</span><strong>{{ $student->full_name }}</strong></div>
             <div class="sp-list-item"><span class="sp-muted">Username</span><strong>{{ $student->username ?? 'Not set' }}</strong></div>
             <div class="sp-list-item"><span class="sp-muted">Email</span><strong>{{ $student->email ?? auth()->user()->email }}</strong></div>

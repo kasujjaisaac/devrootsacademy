@@ -136,6 +136,12 @@
                     <i class="fas fa-calendar" style="width:16px;color:var(--ad-muted);"></i>
                     <span>Applied {{ $application->created_at->format('M d, Y H:i') }}</span>
                 </div>
+                @if($application->student?->student_number)
+                <div style="display:flex;align-items:center;gap:10px;font-size:0.8125rem;">
+                    <i class="fas fa-id-card" style="width:16px;color:var(--ad-muted);"></i>
+                    <span>{{ $application->student->student_number }}</span>
+                </div>
+                @endif
             </div>
         </div>
 
@@ -159,6 +165,10 @@
                 <div>
                     <div style="color:var(--ad-muted);margin-bottom:4px;">Enrollment</div>
                     <div>{{ $application->enrollment?->course?->title ?? 'Not enrolled yet' }}</div>
+                </div>
+                <div>
+                    <div style="color:var(--ad-muted);margin-bottom:4px;">Student Number</div>
+                    <div>{{ $application->student?->student_number ?? 'Not assigned yet' }}</div>
                 </div>
             </div>
         </div>
@@ -217,7 +227,7 @@
 
                         @if($application->status === 'accepted')
                             <button type="submit" formaction="{{ route('admin.student-applications.enroll', $application) }}" class="btn-ad btn-ad-primary">
-                                <i class="fas fa-user-plus"></i> Create Student + Enroll
+                                <i class="fas fa-user-plus"></i> Create Portal Access + Enroll
                             </button>
                         @endif
                     </div>
