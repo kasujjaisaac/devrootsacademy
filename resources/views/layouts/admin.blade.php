@@ -70,15 +70,39 @@
           </a>
         </li>
 
+        <li class="ad-nav-item {{ request()->routeIs('admin.student-applications.*') ? 'active' : '' }}">
+          <a href="{{ route('admin.student-applications.index') }}">
+            <i class="fas fa-file-signature"></i> Applications
+          </a>
+        </li>
+
         <li class="ad-nav-item {{ request()->routeIs('admin.courses.*') ? 'active' : '' }}">
           <a href="{{ route('admin.courses.index') }}">
             <i class="fas fa-book-open"></i> Courses
           </a>
         </li>
 
+        <li class="ad-nav-item {{ request()->routeIs('admin.timetables.*') ? 'active' : '' }}">
+          <a href="{{ route('admin.timetables.index') }}">
+            <i class="fas fa-calendar-days"></i> Timetables
+          </a>
+        </li>
+
+        <li class="ad-nav-item {{ request()->routeIs('admin.partners.*') ? 'active' : '' }}">
+          <a href="{{ route('admin.partners.index') }}">
+            <i class="fas fa-handshake"></i> Partners
+          </a>
+        </li>
+
         <li class="ad-nav-item {{ request()->routeIs('admin.instructors.*') ? 'active' : '' }}">
           <a href="{{ route('admin.instructors.index') }}">
             <i class="fas fa-chalkboard-teacher"></i> Instructors
+          </a>
+        </li>
+
+        <li class="ad-nav-item {{ request()->routeIs('admin.instructor-applications.*') ? 'active' : '' }}">
+          <a href="{{ route('admin.instructor-applications.index') }}">
+            <i class="fas fa-user-check"></i> Instructor Apps
           </a>
         </li>
 

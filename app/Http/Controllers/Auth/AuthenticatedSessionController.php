@@ -7,42 +7,38 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the admin login view.
+     * Display the user login view.
      */
     public function create(): View
     {
-        return view('auth.admin-login');
+        return view('auth.login');
     }
 
     /**
      * Handle an incoming authentication request.
-     * Only users with admin privileges are allowed through.
      */
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
 
-        $user = Auth::user();
-
-        if (!$user->isAdmin()) {
-            Auth::guard('web')->logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            throw ValidationException::withMessages([
-                'email' => 'These credentials do not have admin access.',
-            ]);
-        }
-
         $request->session()->regenerate();
 
-        return redirect()->intended(route('admin.dashboard'));
+        $user = Auth::user();
+
+        if ($user->isAdmin()) {
+            return redirect()->intended(route('admin.dashboard'));
+        }
+
+        if ($user->student) {
+            return redirect()->intended(route('student.dashboard'));
+        }
+
+        return redirect()->intended(route('profile.edit'));
     }
 
     /**

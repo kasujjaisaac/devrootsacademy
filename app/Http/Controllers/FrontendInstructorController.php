@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\InstructorApplicationSubmittedMail;
 use App\Models\Course;
+use App\Models\InstructorApplication;
 use Illuminate\Http\Request;
-use App\Models\Instructor;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 
 class FrontendInstructorController extends Controller
 {
@@ -21,7 +24,13 @@ class FrontendInstructorController extends Controller
     {
         $validated = $request->validate([
             'full_name'        => 'required|string|max:255',
-            'email'            => 'required|email|max:255|unique:instructors,email',
+            'email'            => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('instructor_applications', 'email'),
+                Rule::unique('instructors', 'email'),
+            ],
             'phone'            => 'required|string|max:20',
             'expertise'        => 'required|string|max:255',
             'experience_years' => 'required|integer|min:0|max:60',
@@ -37,7 +46,7 @@ class FrontendInstructorController extends Controller
             'terms.accepted'         => 'You must agree to the terms and conditions to apply.',
         ]);
 
-        Instructor::create([
+        $application = InstructorApplication::create([
             'full_name'        => $validated['full_name'],
             'email'            => $validated['email'],
             'phone'            => $validated['phone'],
@@ -45,8 +54,14 @@ class FrontendInstructorController extends Controller
             'experience_years' => $validated['experience_years'],
             'bio'              => $validated['bio'],
             'portfolio'        => $validated['portfolio'] ?? null,
-            'status'           => 'pending',
+            'agreed_terms'     => true,
+            'status'           => InstructorApplication::STATUS_SUBMITTED,
+            'source'           => 'website',
         ]);
+
+        rescue(function () use ($application) {
+            Mail::to($application->email)->send(new InstructorApplicationSubmittedMail($application));
+        }, report: true);
 
         return back()->with(
             'success',

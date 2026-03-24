@@ -221,24 +221,18 @@
             <span class="title-bar centered"></span>
         </div>
         <div class="row g-3 justify-content-center">
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="partner-logo-card"><img src="{{ asset('images/partners/butende.png') }}" alt="Butende"><span>Butende</span></div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="partner-logo-card"><img src="{{ asset('images/partners/mru.png') }}" alt="MRU"><span>MRU</span></div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="partner-logo-card"><img src="{{ asset('images/partners/mahipso.png') }}" alt="Mahipso"><span>Mahipso</span></div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="partner-logo-card"><img src="{{ asset('images/partners/adic.png') }}" alt="ADIC"><span>ADIC</span></div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="partner-logo-card"><img src="{{ asset('images/partners/masakacity.png') }}" alt="Masaka City"><span>Masaka City</span></div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="partner-logo-card"><img src="{{ asset('images/partners/nita.svg') }}" alt="NITA"><span>NITA</span></div>
-            </div>
+            @forelse($partners as $partner)
+                <div class="col-6 col-md-4 col-lg-2">
+                    <div class="partner-logo-card">
+                        <img src="{{ $partner->logo_url }}" alt="{{ $partner->name }}">
+                        <span>{{ $partner->name }}</span>
+                    </div>
+                </div>
+            @empty
+                <div class="col-12">
+                    <p class="text-center text-muted mb-0">Partner logos will appear here once added.</p>
+                </div>
+            @endforelse
         </div>
         <div class="text-center mt-4">
             <a href="{{ route('partners') }}" class="btn btn-outline-primary">View All Partners</a>

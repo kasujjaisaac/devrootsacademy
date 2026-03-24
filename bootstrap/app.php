@@ -11,9 +11,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->redirectGuestsTo(fn () => route('admin.login'));
+        $middleware->redirectGuestsTo(fn ($request) => $request->is('admin') || $request->is('admin/*')
+            ? route('admin.login')
+            : route('login'));
         $middleware->alias([
             'admin' => \App\Http\Middleware\IsAdmin::class,
+            'student' => \App\Http\Middleware\IsStudent::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

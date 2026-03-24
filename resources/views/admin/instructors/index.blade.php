@@ -1,12 +1,12 @@
 @extends('layouts.admin')
-@section('title', 'Instructor Applications')
+@section('title', 'Instructors')
 
 @section('content')
 
 {{-- Page Header --}}
 <div class="ad-page-hd">
     <div class="ad-page-hd-left">
-        <h1>Instructor Applications</h1>
+        <h1>Instructors</h1>
         <nav class="ad-breadcrumb">
             <a href="{{ route('admin.dashboard') }}">Dashboard</a>
             <i class="fas fa-chevron-right"></i>
@@ -49,8 +49,7 @@
                     <th>Expertise</th>
                     <th>Experience</th>
                     <th>Status</th>
-                    <th>Applied</th>
-                    <th class="cell-action">Actions</th>
+                    <th>Created</th>
                 </tr>
             </thead>
             <tbody>
@@ -75,36 +74,12 @@
                         </span>
                     </td>
                     <td>{{ $instructor->created_at->format('M d, Y') }}</td>
-                    <td>
-                        @if(($instructor->status ?? 'pending') === 'pending')
-                            <div style="display:flex;gap:6px;align-items:center;">
-                                <form method="POST"
-                                      action="{{ route('admin.instructors.approve', $instructor->id) }}"
-                                      style="display:inline;">
-                                    @csrf
-                                    <button type="submit" class="btn-ad btn-ad-success btn-ad-sm">
-                                        <i class="fas fa-check"></i> Approve
-                                    </button>
-                                </form>
-                                <form method="POST"
-                                      action="{{ route('admin.instructors.reject', $instructor->id) }}"
-                                      style="display:inline;">
-                                    @csrf
-                                    <button type="submit" class="btn-ad btn-ad-danger btn-ad-sm">
-                                        <i class="fas fa-times"></i> Reject
-                                    </button>
-                                </form>
-                            </div>
-                        @else
-                            <span style="font-size:0.75rem;color:var(--ad-muted);">—</span>
-                        @endif
-                    </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="ad-table-empty">
+                    <td colspan="7" class="ad-table-empty">
                         <i class="fas fa-chalkboard-teacher"></i>
-                        No instructor applications found.
+                        No instructors found.
                     </td>
                 </tr>
                 @endforelse

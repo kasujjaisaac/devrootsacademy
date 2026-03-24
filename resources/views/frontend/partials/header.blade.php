@@ -34,11 +34,13 @@
                 </li>
                 @auth
                 <li class="nav-item ms-lg-1 mt-1 mt-lg-0">
-                    <a class="btn btn-outline-primary btn-sm px-3" href="{{ route('admin.dashboard') }}">Dashboard</a>
+                    <a class="btn btn-outline-primary btn-sm px-3" href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : (auth()->user()->student ? route('student.dashboard') : route('profile.edit')) }}">
+                        {{ auth()->user()->isAdmin() ? 'Dashboard' : 'Portal' }}
+                    </a>
                 </li>
                 @else
                 <li class="nav-item ms-lg-1 mt-1 mt-lg-0">
-                    <a class="btn btn-outline-primary btn-sm px-3" href="{{ route('admin.login') }}">Login</a>
+                    <a class="btn btn-outline-primary btn-sm px-3" href="{{ route('login') }}">Login</a>
                 </li>
                 @endauth
             </ul>

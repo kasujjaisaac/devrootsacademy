@@ -4,9 +4,11 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Schema;
 use App\Models\Student;
 use App\Models\Course;
 use App\Models\Instructor;
+use App\Models\Partner;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,7 +20,9 @@ class AppServiceProvider extends ServiceProvider
             $view->with('siteStats', [
                 'students' => Student::count() ?: 500,
                 'courses'  => Course::where('is_active', true)->count() ?: 12,
-                'partners' => 8,
+                'partners' => Schema::hasTable('partners')
+                    ? Partner::where('is_active', true)->count()
+                    : 8,
                 'satisfaction' => 95,
             ]);
         });

@@ -3,6 +3,45 @@
 @section('title', 'Our Partners | DevRoots Academy')
 @section('meta_description', 'DevRoots Academy collaborates with industry leaders, government bodies, and institutions to deliver world-class IT education in Masaka, Uganda.')
 
+@push('styles')
+<style>
+.partner-detail-card {
+    background: #fff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    padding: 1.5rem;
+    height: 100%;
+    text-align: center;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+.partner-detail-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
+}
+.partner-detail-card img {
+    width: 100%;
+    max-width: 140px;
+    height: 72px;
+    object-fit: contain;
+    margin: 0 auto 1rem;
+}
+.partner-detail-card h4 {
+    margin-bottom: .35rem;
+}
+.partner-detail-card p {
+    margin-bottom: 0;
+}
+.partner-category {
+    display: inline-block;
+    margin-bottom: .75rem;
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--primary);
+}
+</style>
+@endpush
+
 @section('content')
 
 {{-- ===== PAGE HERO ===== --}}
@@ -39,42 +78,32 @@
             </div>
             <div class="col-lg-7">
                 <div class="row g-3">
-                    <div class="col-6 col-md-4">
-                        <div class="partner-logo-card">
-                            <img src="{{ asset('images/partners/butende.png') }}" alt="Butende">
-                            <span>Butende</span>
+                    @forelse($partners as $partner)
+                        <div class="col-md-6">
+                            <div class="partner-detail-card">
+                                <img src="{{ $partner->logo_url }}" alt="{{ $partner->name }}">
+                                @if($partner->category)
+                                    <span class="partner-category">{{ $partner->category }}</span>
+                                @endif
+                                <h4>{{ $partner->name }}</h4>
+                                <p>{{ $partner->short_description ?: 'Partnering with DevRoots Academy to expand access to practical, industry-aligned technology education.' }}</p>
+                                @if($partner->website_url)
+                                    <div class="mt-3">
+                                        <a href="{{ $partner->website_url }}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">
+                                            Visit Website
+                                        </a>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-6 col-md-4">
-                        <div class="partner-logo-card">
-                            <img src="{{ asset('images/partners/mru.png') }}" alt="MRU">
-                            <span>MRU</span>
+                    @empty
+                        <div class="col-12">
+                            <div class="why-item h-100">
+                                <h4>No partners published yet</h4>
+                                <p>Use the admin area to add partner records and they will appear here automatically.</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-6 col-md-4">
-                        <div class="partner-logo-card">
-                            <img src="{{ asset('images/partners/mahipso.png') }}" alt="Mahipso">
-                            <span>Mahipso</span>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-4">
-                        <div class="partner-logo-card">
-                            <img src="{{ asset('images/partners/adic.png') }}" alt="ADIC">
-                            <span>ADIC</span>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-4">
-                        <div class="partner-logo-card">
-                            <img src="{{ asset('images/partners/masakacity.png') }}" alt="Masaka City">
-                            <span>Masaka City</span>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-4">
-                        <div class="partner-logo-card">
-                            <img src="{{ asset('images/partners/nita.svg') }}" alt="NITA">
-                            <span>NITA</span>
-                        </div>
-                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>

@@ -214,18 +214,18 @@
                                         <label for="course_interest" class="form-label">
                                             Select Course <span class="text-primary">*</span>
                                         </label>
-                                        <select id="course_interest" name="course_interest"
-                                                class="form-select @error('course_interest') is-invalid @enderror"
+                                        <select id="course_interest" name="course_id"
+                                                class="form-select @error('course_id') is-invalid @enderror"
                                                 required>
                                             <option value="">Choose your course of interest</option>
                                             @foreach($courses as $course)
-                                                <option value="{{ $course }}"
-                                                    {{ old('course_interest') === $course ? 'selected' : '' }}>
-                                                    {{ $course }}
+                                                <option value="{{ $course->id }}"
+                                                    {{ (string) old('course_id') === (string) $course->id ? 'selected' : '' }}>
+                                                    {{ $course->title }}
                                                 </option>
                                             @endforeach
                                         </select>
-                                        @error('course_interest')
+                                        @error('course_id')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>

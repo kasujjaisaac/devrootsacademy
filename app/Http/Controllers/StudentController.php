@@ -9,7 +9,14 @@ class StudentController extends Controller
 {
     public function index()
     {
-        $students = Student::latest()->paginate(20);
+        $students = Student::query()
+            ->where(function ($query) {
+                $query->whereHas('enrollments')
+                    ->orWhereIn('status', ['active', 'finished']);
+            })
+            ->latest()
+            ->paginate(20);
+
         return view('admin.students.index', compact('students'));
     }
 
