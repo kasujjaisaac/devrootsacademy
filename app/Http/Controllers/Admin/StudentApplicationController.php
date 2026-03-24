@@ -155,6 +155,7 @@ class StudentApplicationController extends Controller
                 ['email' => $studentApplication->email],
                 [
                     'name' => $studentApplication->full_name,
+                    'username' => User::generateUsername($studentApplication->username, $studentApplication->email ?: $studentApplication->full_name),
                     'password' => Str::random(32),
                     'role' => 'student',
                     'is_admin' => false,
