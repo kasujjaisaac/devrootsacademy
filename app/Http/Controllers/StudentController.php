@@ -12,7 +12,7 @@ class StudentController extends Controller
         $students = Student::query()
             ->where(function ($query) {
                 $query->whereHas('enrollments')
-                    ->orWhereIn('status', ['active', 'finished']);
+                    ->orWhereIn('status', [Student::STATUS_ACTIVE, Student::STATUS_FINISHED, Student::STATUS_INACTIVE]);
             })
             ->latest()
             ->paginate(20);
@@ -31,9 +31,9 @@ class StudentController extends Controller
 
         $stats = [
             'total_enrollments' => $student->enrollments->count(),
-            'active_courses'    => $student->enrollments->where('status', 'active')->count(),
-            'completed_courses' => $student->enrollments->where('status', 'completed')->count(),
-            'total_paid'        => $student->payments->where('status', 'paid')->sum('amount'),
+            'active_courses'    => $student->enrollments->where('status', \App\Models\Enrollment::STATUS_ACTIVE)->count(),
+            'completed_courses' => $student->enrollments->where('status', \App\Models\Enrollment::STATUS_COMPLETED)->count(),
+            'total_paid'        => $student->payments->where('status', \App\Models\Payment::STATUS_COMPLETED)->sum('amount'),
             'total_payments'    => $student->payments->count(),
         ];
 
@@ -42,7 +42,7 @@ class StudentController extends Controller
     public function edit(Student $student) {}
     public function update(Request $request, Student $student)
     {
-        $request->validate(['status' => 'required|in:pending,active,finished,rejected']);
+        $request->validate(['status' => 'required|in:active,inactive,finished']);
         $student->update(['status' => $request->status]);
         return back()->with('success', 'Student status updated successfully.');
     }

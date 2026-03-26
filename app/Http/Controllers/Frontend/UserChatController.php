@@ -7,6 +7,7 @@ use App\Models\Chat;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class UserChatController extends Controller
 {
@@ -14,21 +15,49 @@ class UserChatController extends Controller
     public function index()
     {
         $chats = Chat::where('user_id', Auth::id())
-            ->orderBy('updated_at', 'desc')
+            ->withCount([
+                'messages as unread_count' => fn ($query) => $query
+                    ->where('is_admin', true)
+                    ->whereNull('read_at'),
+            ])
+            ->orderByDesc('last_message_at')
+            ->latest()
             ->get();
-        return view('frontend.chat.index', compact('chats'));
+
+        $prefill = [
+            'category' => request()->query('category'),
+            'subject' => request()->query('subject'),
+            'message' => request()->query('message'),
+        ];
+
+        return view('frontend.chat.index', compact('chats', 'prefill'));
     }
 
-    // Start a new chat (if none open)
     public function start(Request $request)
     {
         $request->validate([
+            'category' => 'required|in:'.implode(',', array_keys(Chat::categories())),
             'subject' => 'nullable|string|max:255',
+            'message' => 'required|string|max:2000',
         ]);
-        $chat = Chat::firstOrCreate(
-            ['user_id' => Auth::id(), 'status' => 'open'],
-            ['subject' => $request->subject]
-        );
+
+        $chat = Chat::create([
+            'user_id' => Auth::id(),
+            'reference' => $this->reference(),
+            'subject' => $request->subject,
+            'category' => $request->category,
+            'priority' => 'normal',
+            'status' => Chat::STATUS_PENDING_ADMIN,
+            'last_message_at' => now(),
+        ]);
+
+        Message::create([
+            'chat_id' => $chat->id,
+            'sender_id' => Auth::id(),
+            'message' => $request->message,
+            'is_admin' => false,
+        ]);
+
         return redirect()->route('user.chat.show', $chat->id);
     }
 
@@ -38,6 +67,14 @@ class UserChatController extends Controller
         $chat = Chat::with(['messages.sender', 'admin'])
             ->where('user_id', Auth::id())
             ->findOrFail($id);
+
+        $chat->messages()
+            ->where('is_admin', true)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        $chat->load(['messages.sender', 'admin']);
+
         if (request()->ajax()) {
             return view('frontend.chat._messages', compact('chat'))->render();
         }
@@ -57,7 +94,16 @@ class UserChatController extends Controller
             'message' => $request->message,
             'is_admin' => false,
         ]);
-        $chat->touch();
+        $chat->update([
+            'status' => Chat::STATUS_PENDING_ADMIN,
+            'resolved_at' => null,
+            'last_message_at' => now(),
+        ]);
         return redirect()->route('user.chat.show', $chat->id)->with('success', 'Message sent!');
+    }
+
+    protected function reference(): string
+    {
+        return 'SUP-'.now()->format('Ymd').'-'.Str::upper(Str::random(6));
     }
 }

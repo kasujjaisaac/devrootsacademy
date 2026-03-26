@@ -34,7 +34,7 @@
       <div class="ad-form-group">
         <label class="ad-label" for="status">Status <span class="required">*</span></label>
         <select name="status" id="status" class="ad-select" required>
-          @foreach(['pending','active','completed','dropped'] as $s)
+          @foreach(['pending','active','completed','cancelled'] as $s)
           <option value="{{ $s }}" {{ $enrollment->status == $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>
           @endforeach
         </select>

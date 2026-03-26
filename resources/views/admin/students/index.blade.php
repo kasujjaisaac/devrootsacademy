@@ -69,7 +69,7 @@
                     <td>
                         @php $st = $student->status ?? 'pending'; @endphp
                         <span class="ad-badge
-                            {{ $st === 'active' ? 'ad-badge-active' : ($st === 'rejected' ? 'ad-badge-rejected' : 'ad-badge-pending') }}">
+                            {{ $st === 'active' ? 'ad-badge-active' : ($st === 'finished' ? 'ad-badge-finished' : ($st === 'inactive' ? 'ad-badge-rejected' : 'ad-badge-pending')) }}">
                             {{ ucfirst($st) }}
                         </span>
                     </td>

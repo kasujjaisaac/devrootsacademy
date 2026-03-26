@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AdminNewStudentApplicationMail;
 use App\Mail\StudentApplicationSubmittedMail;
 use App\Models\Course;
 use App\Models\StudentApplication;
@@ -74,6 +75,14 @@ class FrontendStudentController extends Controller
         if ($application->email) {
             rescue(function () use ($application) {
                 Mail::to($application->email)->send(new StudentApplicationSubmittedMail($application->load('course')));
+            }, report: true);
+        }
+
+        $admissionsAddress = config('mail.notifications.admissions_address');
+
+        if ($admissionsAddress) {
+            rescue(function () use ($application, $admissionsAddress) {
+                Mail::to($admissionsAddress)->send(new AdminNewStudentApplicationMail($application->load('course')));
             }, report: true);
         }
 

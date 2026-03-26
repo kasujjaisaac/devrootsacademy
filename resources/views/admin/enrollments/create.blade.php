@@ -50,7 +50,7 @@
       <div class="ad-form-group">
         <label class="ad-label" for="status">Status</label>
         <select name="status" id="status" class="ad-select">
-          @foreach(['pending','active','completed','dropped'] as $s)
+          @foreach(['pending','active','completed','cancelled'] as $s)
           <option value="{{ $s }}" {{ old('status', 'pending') == $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>
           @endforeach
         </select>

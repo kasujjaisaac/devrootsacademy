@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\Course;
+use App\Models\Enrollment;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -51,6 +52,19 @@ class PaymentController extends Controller
             'gateway_tracking_id' => 'nullable|string|max:120',
             'paid_at' => 'nullable|date',
         ]);
+
+        $hasEnrollment = Enrollment::query()
+            ->where('student_id', $validated['student_id'])
+            ->where('course_id', $validated['course_id'])
+            ->exists();
+
+        if (! $hasEnrollment) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'course_id' => 'Payments can only be recorded for courses the student is enrolled in.',
+                ]);
+        }
 
         Payment::create([
             'student_id' => $validated['student_id'],

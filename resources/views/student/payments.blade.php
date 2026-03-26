@@ -15,9 +15,18 @@
                 <span class="sp-chip"><i class="fas fa-credit-card"></i> {{ $payments->count() }} payment records</span>
             </div>
             @if($courseBalances->isNotEmpty())
-                <div style="margin-top:18px;">
+                <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;">
                     <a href="#make-payment" class="btn-ad btn-ad-light">
                         <i class="fas fa-arrow-up-right-from-square"></i> Make Payment
+                    </a>
+                    <a href="{{ route('user.chat.index', ['category' => 'finance', 'subject' => 'Finance support request', 'message' => 'Hello, I need help understanding my balance, payment status, or receipt.']) }}" class="btn-ad btn-ad-outline" style="background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.22);color:#fff;">
+                        <i class="fas fa-comments-dollar"></i> Ask Finance
+                    </a>
+                </div>
+            @else
+                <div style="margin-top:18px;">
+                    <a href="{{ route('user.chat.index', ['category' => 'finance', 'subject' => 'Finance support request', 'message' => 'Hello, I need help understanding my balance, payment status, or receipt.']) }}" class="btn-ad btn-ad-outline" style="background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.22);color:#fff;">
+                        <i class="fas fa-comments-dollar"></i> Ask Finance
                     </a>
                 </div>
             @endif

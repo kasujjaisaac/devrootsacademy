@@ -107,7 +107,7 @@
               'active'   => 'ad-badge-active',
               'finished' => 'ad-badge-finished',
               'pending'  => 'ad-badge-pending',
-              'rejected' => 'ad-badge-rejected',
+              'inactive' => 'ad-badge-rejected',
             ];
           @endphp
           <span class="ad-badge {{ $badgeMap[$s] ?? 'ad-badge-pending' }}">
@@ -205,10 +205,10 @@
     </div>
     @endif
 
-    {{-- Update Status Card --}}
+    {{-- Status Summary Card --}}
     <div class="ad-card">
       <div style="padding:14px 20px;border-bottom:1px solid var(--ad-border);font-weight:600;font-size:0.875rem;">
-        Update Status
+        Status Summary
       </div>
       <div style="padding:16px 20px;">
         <form method="POST" action="{{ route('admin.students.update', $student) }}">
@@ -216,12 +216,12 @@
           <div class="ad-form-group">
             <label class="ad-label">Status</label>
             <select name="status" class="ad-input">
-              <option value="pending"  {{ $student->status === 'pending'  ? 'selected' : '' }}>Pending</option>
               <option value="active"   {{ $student->status === 'active'   ? 'selected' : '' }}>Active</option>
+              <option value="inactive" {{ $student->status === 'inactive' ? 'selected' : '' }}>Inactive</option>
               <option value="finished" {{ $student->status === 'finished' ? 'selected' : '' }}>Finished</option>
-              <option value="rejected" {{ $student->status === 'rejected' ? 'selected' : '' }}>Rejected</option>
             </select>
           </div>
+          <p class="ad-input-hint" style="margin-bottom:12px;">Course progression is controlled from enrollments. This field is only the learner profile summary.</p>
           <button type="submit" class="btn-ad btn-ad-primary" style="width:100%;">
             <i class="fas fa-floppy-disk"></i> Save Status
           </button>

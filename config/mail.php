@@ -115,4 +115,11 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    'notifications' => [
+        'admissions_address' => env('MAIL_ADMISSIONS_ADDRESS'),
+        'admissions_name' => env('MAIL_ADMISSIONS_NAME', 'Admissions'),
+        'payments_address' => env('MAIL_PAYMENTS_ADDRESS', env('MAIL_ADMISSIONS_ADDRESS')),
+        'payments_name' => env('MAIL_PAYMENTS_NAME', env('MAIL_ADMISSIONS_NAME', 'Admissions')),
+    ],
+
 ];

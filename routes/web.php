@@ -86,6 +86,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/chats',               [\App\Http\Controllers\Admin\ChatController::class, 'index'])->name('admin.chats.index');
     Route::get('/chats/{id}',          [\App\Http\Controllers\Admin\ChatController::class, 'show'])->name('admin.chats.show');
     Route::post('/chats/{id}/message', [\App\Http\Controllers\Admin\ChatController::class, 'sendMessage'])->name('admin.chats.message');
+    Route::post('/chats/{id}/status',  [\App\Http\Controllers\Admin\ChatController::class, 'updateStatus'])->name('admin.chats.status');
+    Route::post('/chats/{id}/assign',  [\App\Http\Controllers\Admin\ChatController::class, 'assignToMe'])->name('admin.chats.assign');
     Route::get('/settings',            [SettingController::class, 'index'])->name('admin.settings.index');
 });
 

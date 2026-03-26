@@ -14,6 +14,11 @@
                 <span class="sp-chip"><i class="fas fa-calendar-days"></i> {{ $events->count() }} upcoming items</span>
                 <span class="sp-chip"><i class="fas fa-book-open"></i> {{ $student->enrollments->count() }} enrolled courses</span>
             </div>
+            <div style="margin-top:18px;">
+                <a href="{{ route('user.chat.index', ['category' => 'timetable', 'subject' => 'Timetable support request', 'message' => 'Hello, I need help with my class schedule, timetable, or a published calendar item.']) }}" class="btn-ad btn-ad-light">
+                    <i class="fas fa-comments"></i> Ask About Timetable
+                </a>
+            </div>
         </div>
     </div>
 

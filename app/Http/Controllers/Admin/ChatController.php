@@ -10,27 +10,39 @@ use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
 {
-    // Show all chats (latest first)
     public function index()
     {
         $chats = Chat::with(['user', 'admin'])
-            ->orderBy('updated_at', 'desc')
+            ->withCount([
+                'messages as unread_count' => fn ($query) => $query
+                    ->where('is_admin', false)
+                    ->whereNull('read_at'),
+            ])
+            ->orderByDesc('unread_count')
+            ->orderByDesc('last_message_at')
+            ->latest()
             ->paginate(10);
         return view('admin.chats.index', compact('chats'));
     }
 
-    // Show a single chat with messages
     public function show($id)
     {
         $chat = Chat::with(['user', 'admin', 'messages.sender'])
             ->findOrFail($id);
+
+        $chat->messages()
+            ->where('is_admin', false)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        $chat->load(['user', 'admin', 'messages.sender']);
+
         if (request()->ajax()) {
             return view('admin.chats._messages', compact('chat'))->render();
         }
         return view('admin.chats.show', compact('chat'));
     }
 
-    // Handle admin sending a message
     public function sendMessage(Request $request, $id)
     {
         $request->validate([
@@ -43,11 +55,37 @@ class ChatController extends Controller
             'sender_id' => $admin->id,
             'message' => $request->message,
             'is_admin' => true,
+            'read_at' => now(),
         ]);
         $chat->admin_id = $admin->id;
-        $chat->touch();
+        $chat->status = Chat::STATUS_PENDING_STUDENT;
+        $chat->resolved_at = null;
+        $chat->last_message_at = now();
         $chat->save();
-        // (Optional) trigger notification/event here
+
         return redirect()->route('admin.chats.show', $chat->id)->with('success', 'Message sent!');
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:'.implode(',', array_keys(Chat::statuses())),
+        ]);
+
+        $chat = Chat::findOrFail($id);
+        $chat->status = $request->status;
+        $chat->resolved_at = $request->status === Chat::STATUS_RESOLVED ? now() : null;
+        $chat->save();
+
+        return redirect()->route('admin.chats.show', $chat->id)->with('success', 'Conversation status updated.');
+    }
+
+    public function assignToMe($id)
+    {
+        $chat = Chat::findOrFail($id);
+        $chat->admin_id = Auth::id();
+        $chat->save();
+
+        return redirect()->route('admin.chats.show', $chat->id)->with('success', 'Conversation assigned to you.');
     }
 }

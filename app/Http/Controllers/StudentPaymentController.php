@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AdminStudentPaymentReceivedMail;
 use App\Models\Payment;
 use App\Services\PesapalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -152,6 +154,8 @@ class StudentPaymentController extends Controller
 
     protected function refreshPaymentStatus(Payment $payment, string $trackingId): bool
     {
+        $wasCompleted = $payment->status === Payment::STATUS_COMPLETED;
+
         try {
             $statusPayload = $this->pesapal->getTransactionStatus($trackingId ?: (string) $payment->gateway_tracking_id);
         } catch (Throwable $e) {
@@ -176,6 +180,16 @@ class StudentPaymentController extends Controller
             'raw_response' => array_merge($payment->raw_response ?? [], ['status_lookup' => $statusPayload]),
             'paid_at' => $mappedStatus === Payment::STATUS_COMPLETED ? ($payment->paid_at ?? now()) : $payment->paid_at,
         ]);
+
+        if (! $wasCompleted && $mappedStatus === Payment::STATUS_COMPLETED) {
+            $paymentsAddress = config('mail.notifications.payments_address');
+
+            if ($paymentsAddress) {
+                rescue(function () use ($payment, $paymentsAddress) {
+                    Mail::to($paymentsAddress)->send(new AdminStudentPaymentReceivedMail($payment->fresh(['student', 'course'])));
+                }, report: true);
+            }
+        }
 
         return true;
     }

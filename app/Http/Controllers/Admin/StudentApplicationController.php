@@ -92,7 +92,7 @@ class StudentApplicationController extends Controller
                     'course_interest' => $studentApplication->course?->title,
                     'goals' => $studentApplication->goals,
                     'agreed_terms' => $studentApplication->agreed_terms,
-                    'status' => 'pending',
+                    'status' => Student::STATUS_PENDING,
                 ]);
             } elseif (! $student->student_number) {
                 $student->update([
@@ -174,7 +174,7 @@ class StudentApplicationController extends Controller
                 'course_interest' => $studentApplication->course?->title,
                 'goals' => $studentApplication->goals,
                 'agreed_terms' => $studentApplication->agreed_terms,
-                'status' => 'active',
+                'status' => Student::STATUS_ACTIVE,
             ]);
 
             if (! $student->user_id) {
@@ -191,9 +191,15 @@ class StudentApplicationController extends Controller
                     'course_id' => $studentApplication->course_id,
                 ],
                 [
-                    'status' => 'active',
+                    'status' => Enrollment::STATUS_ACTIVE,
                 ]
             );
+
+            if ($enrollment->status !== Enrollment::STATUS_ACTIVE) {
+                $enrollment->update(['status' => Enrollment::STATUS_ACTIVE]);
+            }
+
+            $student->syncLifecycleStatus();
 
             $studentApplication->update([
                 'status' => StudentApplication::STATUS_ENROLLED,

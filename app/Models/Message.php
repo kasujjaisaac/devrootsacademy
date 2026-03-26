@@ -10,7 +10,11 @@ class Message extends Model
     use HasFactory;
 
     protected $fillable = [
-        'chat_id', 'sender_id', 'message', 'is_admin'
+        'chat_id', 'sender_id', 'message', 'is_admin', 'read_at'
+    ];
+
+    protected $casts = [
+        'read_at' => 'datetime',
     ];
 
     public function chat()

@@ -16,9 +16,18 @@
                 <span class="sp-chip"><i class="fas fa-calendar-days"></i> {{ $events->count() }} upcoming item{{ $events->count() === 1 ? '' : 's' }}</span>
             </div>
             @if($stats['balance'] > 0)
-                <div style="margin-top:18px;">
+                <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;">
                     <a href="{{ route('student.payments') }}" class="btn-ad btn-ad-light">
                         <i class="fas fa-credit-card"></i> Make Payment
+                    </a>
+                    <a href="{{ route('user.chat.index', ['category' => 'general', 'subject' => 'General student support', 'message' => 'Hello, I need help with my student portal or academy support request.']) }}" class="btn-ad btn-ad-outline" style="background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.22);color:#fff;">
+                        <i class="fas fa-comments"></i> Get Support
+                    </a>
+                </div>
+            @else
+                <div style="margin-top:18px;">
+                    <a href="{{ route('user.chat.index', ['category' => 'general', 'subject' => 'General student support', 'message' => 'Hello, I need help with my student portal or academy support request.']) }}" class="btn-ad btn-ad-outline" style="background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.22);color:#fff;">
+                        <i class="fas fa-comments"></i> Get Support
                     </a>
                 </div>
             @endif

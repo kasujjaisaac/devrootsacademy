@@ -3,10 +3,28 @@
 
 @section('content')
 <div class="mb-8">
-    <h1 class="text-2xl font-bold">Chat with {{ $chat->user->full_name ?? $chat->user->name ?? 'User' }}</h1>
-    <p class="text-gray-500">Subject: {{ $chat->subject ?? 'No subject' }}</p>
+    <h1 class="text-2xl font-bold">Support Conversation with {{ $chat->user->full_name ?? $chat->user->name ?? 'User' }}</h1>
+    <p class="text-gray-500">{{ $chat->reference ?? '—' }} • {{ \App\Models\Chat::categories()[$chat->category] ?? ucfirst($chat->category ?? 'General') }} • {{ $chat->subject ?? 'No subject' }}</p>
 </div>
 <div class="bg-white rounded shadow p-4 mb-6 max-w-2xl mx-auto">
+    <div class="mb-4 flex items-center justify-between gap-3">
+        <div class="text-sm text-gray-500">
+            Assigned Admin: <strong>{{ $chat->admin->name ?? 'Unassigned' }}</strong>
+        </div>
+        <form action="{{ route('admin.chats.assign', $chat->id) }}" method="POST">
+            @csrf
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Assign to Me</button>
+        </form>
+    </div>
+    <form action="{{ route('admin.chats.status', $chat->id) }}" method="POST" class="mb-4 flex items-center gap-3">
+        @csrf
+        <select name="status" class="px-3 py-2 border rounded">
+            @foreach(\App\Models\Chat::statuses() as $value => $label)
+                <option value="{{ $value }}" {{ $chat->status === $value ? 'selected' : '' }}>{{ $label }}</option>
+            @endforeach
+        </select>
+        <button type="submit" class="px-4 py-2 bg-gray-900 text-white rounded">Update Status</button>
+    </form>
     <div id="chat-messages" class="space-y-4 max-h-96 overflow-y-auto">
         @foreach($chat->messages as $message)
             <div class="flex {{ $message->is_admin ? 'justify-end' : 'justify-start' }}">

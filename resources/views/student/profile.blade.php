@@ -14,6 +14,11 @@
                 <span class="sp-chip"><i class="fas fa-id-badge"></i> {{ $student->student_number ?? 'Student number pending' }}</span>
                 <span class="sp-chip"><i class="fas fa-envelope"></i> {{ $student->email ?? auth()->user()->email }}</span>
             </div>
+            <div style="margin-top:18px;">
+                <a href="{{ route('user.chat.index', ['category' => 'general', 'subject' => 'Profile support request', 'message' => 'Hello, I need help with my student profile or account details.']) }}" class="btn-ad btn-ad-light">
+                    <i class="fas fa-comments"></i> Ask for Help
+                </a>
+            </div>
         </div>
     </div>
 
