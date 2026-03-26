@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CalendarEvent;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 
 class StudentPortalController extends Controller
@@ -14,7 +15,7 @@ class StudentPortalController extends Controller
         $payments = $student->payments()->with('course')->latest()->take(5)->get();
 
         $feeTotal = $student->enrollments->sum(fn($enrollment) => (int) ($enrollment->course?->fee ?? 0));
-        $paidTotal = (int) $student->payments->sum('amount');
+        $paidTotal = (int) $student->payments->where('status', Payment::STATUS_COMPLETED)->sum('amount');
 
         return view('student.dashboard', [
             'student' => $student,
@@ -42,14 +43,36 @@ class StudentPortalController extends Controller
         $student = $this->student($request);
         $payments = $student->payments()->with('course')->latest()->get();
         $feeTotal = $student->enrollments->sum(fn($enrollment) => (int) ($enrollment->course?->fee ?? 0));
-        $paidTotal = (int) $student->payments->sum('amount');
+        $paidTotal = (int) $student->payments->where('status', Payment::STATUS_COMPLETED)->sum('amount');
+        $pendingTotal = (int) $student->payments->where('status', Payment::STATUS_PENDING)->sum('amount');
+        $courseBalances = $student->enrollments
+            ->filter(fn ($enrollment) => $enrollment->course)
+            ->map(function ($enrollment) use ($student) {
+                $completedPaid = (float) $student->payments
+                    ->where('course_id', $enrollment->course_id)
+                    ->where('status', Payment::STATUS_COMPLETED)
+                    ->sum('amount');
+
+                $outstanding = max(((float) $enrollment->course->fee) - $completedPaid, 0);
+
+                return (object) [
+                    'course' => $enrollment->course,
+                    'outstanding' => $outstanding,
+                    'completed_paid' => $completedPaid,
+                    'status' => $enrollment->status,
+                ];
+            })
+            ->filter(fn ($item) => $item->outstanding > 0)
+            ->values();
 
         return view('student.payments', [
             'student' => $student,
             'payments' => $payments,
+            'courseBalances' => $courseBalances,
             'summary' => [
                 'fee_total' => $feeTotal,
                 'paid_total' => $paidTotal,
+                'pending_total' => $pendingTotal,
                 'balance' => max($feeTotal - $paidTotal, 0),
             ],
         ]);

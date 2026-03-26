@@ -13,6 +13,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\Frontend\CourseController as FrontendCourseController;
 use App\Http\Controllers\Frontend\PartnerController as FrontendPartnerController;
 use App\Http\Controllers\StudentPortalController;
+use App\Http\Controllers\StudentPaymentController;
 use App\Http\Controllers\FrontendStudentController;
 use App\Http\Controllers\FrontendInstructorController;
 use App\Http\Controllers\ContactController;
@@ -53,7 +54,11 @@ Route::prefix('student')->middleware(['auth', 'student'])->group(function () {
     Route::get('/profile', [StudentPortalController::class, 'profile'])->name('student.profile');
     Route::get('/payments', [StudentPortalController::class, 'payments'])->name('student.payments');
     Route::get('/calendar', [StudentPortalController::class, 'calendar'])->name('student.calendar');
+    Route::post('/payments/initiate', [StudentPaymentController::class, 'initiate'])->name('student.payments.initiate');
 });
+
+Route::get('/student/payments/callback', [StudentPaymentController::class, 'callback'])->name('student.payments.callback');
+Route::match(['get', 'post'], '/payments/pesapal/ipn', [StudentPaymentController::class, 'ipn'])->name('payments.pesapal.ipn');
 
 // Admin Routes
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {

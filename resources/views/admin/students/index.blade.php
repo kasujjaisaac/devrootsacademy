@@ -47,6 +47,7 @@
             <thead>
                 <tr>
                     <th class="cell-sm">#</th>
+                    <th>Student No.</th>
                     <th>Full Name</th>
                     <th>Email</th>
                     <th>Phone</th>
@@ -60,6 +61,7 @@
                 @forelse($students as $student)
                 <tr>
                     <td>{{ $students->firstItem() + $loop->index }}</td>
+                    <td>{{ $student->student_number ?? 'Pending' }}</td>
                     <td>{{ $student->full_name }}</td>
                     <td>{{ $student->email ?? '-' }}</td>
                     <td>{{ $student->phone ?? '-' }}</td>
@@ -81,7 +83,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="ad-table-empty">
+                    <td colspan="9" class="ad-table-empty">
                         <i class="fas fa-user-graduate"></i>
                         No students found.
                     </td>

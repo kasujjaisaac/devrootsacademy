@@ -74,7 +74,9 @@
 
   <div class="ad-login-footer" style="justify-content:space-between;">
     <a href="{{ route('password.request') }}">Forgot password?</a>
-    <a href="{{ route('register') }}">Create account</a>
+    <span style="color:var(--ad-muted);font-size:0.82rem;text-align:right;">
+      Student accounts are created after enrollment
+    </span>
   </div>
 </div>
 

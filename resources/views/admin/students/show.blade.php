@@ -92,6 +92,11 @@
         <div style="font-size:1rem;font-weight:600;color:var(--ad-text);">
           {{ $student->full_name ?? '—' }}
         </div>
+        @if($student->student_number)
+        <div style="font-size:0.78rem;color:var(--ad-primary);margin-top:4px;font-weight:600;">
+          {{ $student->student_number }}
+        </div>
+        @endif
         @if($student->username)
         <div style="font-size:0.8rem;color:var(--ad-muted);margin-top:2px;">@{{ $student->username }}</div>
         @endif
@@ -129,6 +134,11 @@
           <span>{{ $student->phone }}</span>
         </div>
         @endif
+
+        <div style="display:flex;align-items:center;gap:10px;font-size:0.8125rem;">
+          <i class="fas fa-id-badge" style="width:16px;color:var(--ad-muted);flex-shrink:0;"></i>
+          <span>{{ $student->student_number ?? 'Pending assignment' }}</span>
+        </div>
 
         @if($student->location)
         <div style="display:flex;align-items:center;gap:10px;font-size:0.8125rem;">

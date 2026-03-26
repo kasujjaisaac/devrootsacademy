@@ -17,10 +17,10 @@
             margin-bottom: 20px;
         }
         .sp-hero-card {
-            background: linear-gradient(135deg, #111827 0%, #1f2937 60%, #7f1d1d 100%);
+            background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 58%, #ef4444 100%);
             color: #fff;
             border: none;
-            box-shadow: 0 18px 45px rgba(17, 24, 39, 0.18);
+            box-shadow: 0 18px 45px rgba(185, 28, 28, 0.22);
         }
         .sp-hero-card h2 {
             margin: 0 0 8px;
