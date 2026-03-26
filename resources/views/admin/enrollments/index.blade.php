@@ -48,7 +48,7 @@
           @forelse($enrollments as $i => $e)
           <tr>
             <td>{{ $i + 1 }}</td>
-            <td>{{ $e->student->full_name ?? ($e->student->first_name . ' ' . $e->student->last_name) ?? 'N/A' }}</td>
+            <td>{{ $e->student?->full_name ?? trim(($e->student?->first_name ?? '').' '.($e->student?->last_name ?? '')) ?: 'N/A' }}</td>
             <td>{{ $e->course->title ?? 'N/A' }}</td>
             <td>
               <span class="ad-badge ad-badge-{{ $e->status === 'active' ? 'active' : ($e->status === 'completed' ? 'finished' : 'pending') }}">

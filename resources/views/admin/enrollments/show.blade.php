@@ -27,7 +27,7 @@
   <div class="ad-card-body">
     <div class="ad-form-group">
       <label class="ad-label">Student</label>
-      <p>{{ $enrollment->student->full_name ?? ($enrollment->student->first_name . ' ' . $enrollment->student->last_name) ?? 'N/A' }}</p>
+      <p>{{ $enrollment->student?->full_name ?? trim(($enrollment->student?->first_name ?? '').' '.($enrollment->student?->last_name ?? '')) ?: 'N/A' }}</p>
     </div>
     <div class="ad-form-group">
       <label class="ad-label">Course</label>

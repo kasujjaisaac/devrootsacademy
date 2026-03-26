@@ -23,7 +23,7 @@
   <div class="ad-card-body">
     <div class="ad-form-group">
       <label class="ad-label">Student</label>
-      <input type="text" class="ad-input" value="{{ $enrollment->student->full_name ?? 'N/A' }}" readonly>
+      <input type="text" class="ad-input" value="{{ $enrollment->student?->full_name ?? trim(($enrollment->student?->first_name ?? '').' '.($enrollment->student?->last_name ?? '')) ?: 'N/A' }}" readonly>
     </div>
     <div class="ad-form-group">
       <label class="ad-label">Course</label>
