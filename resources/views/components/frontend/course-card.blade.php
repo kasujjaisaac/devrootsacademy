@@ -8,6 +8,8 @@
       $duration — e.g. "8 Weeks"
       $level    — e.g. "Beginner", "Intermediate", "Advanced"
       $enrollmentStatus — array with label, tone, message
+      $fee      — formatted fee string
+      $actionLabel — button label
       $slug     — (optional) course slug for detail page; falls back to apply-now
 --}}
 <div class="course-card">
@@ -30,14 +32,13 @@
         </div>
         <h3>{{ $title }}</h3>
         <p>{{ $desc }}</p>
-        @if(!empty($slug))
-            <a href="{{ route('courses.show', $slug) }}" class="btn btn-primary btn-sm w-100 mt-auto">
-                View Course
-            </a>
-        @else
-            <a href="{{ route('apply.now') }}" class="btn btn-primary btn-sm w-100 mt-auto">
-                Apply Now
-            </a>
-        @endif
+        <div class="d-flex align-items-center justify-content-between mt-auto mb-3 flex-wrap gap-1">
+            @if(!empty($fee))
+                <span class="course-fee">{{ $fee }}</span>
+            @endif
+        </div>
+        <a href="{{ !empty($slug) ? route('courses.show', $slug) : route('apply.now') }}" class="btn btn-primary btn-sm w-100">
+            {{ $actionLabel ?? (!empty($slug) ? 'View Course' : 'Apply Now') }}
+        </a>
     </div>
 </div>

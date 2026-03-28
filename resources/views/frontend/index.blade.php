@@ -109,6 +109,7 @@
                     :duration="$course->duration_weeks ? $course->duration_weeks . ' Weeks' : ''"
                     :level="$course->level ?: ''"
                     :enrollment-status="$course->enrollmentStatus()"
+                    action-label="View Course"
                     :slug="$course->slug" />
             @empty
                 <p class="no-courses text-center">No active courses are available yet.</p>

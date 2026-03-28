@@ -47,38 +47,16 @@
     <div class="courses-content p-4">
         <div class="courses-grid-listing">
             @forelse($courses as $course)
-                <div class="course-card">
-                    <div class="course-card-img">
-                        <img src="{{ $course->image ? asset('storage/' . $course->image) : asset('images/courses/programming.png') }}"
-                             alt="{{ $course->title }}"
-                             loading="lazy">
-                    </div>
-                    <div class="course-card-body">
-                        @php($enrollmentStatus = $course->enrollmentStatus())
-                        <div class="course-meta-tags" style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;">
-                            @if($course->level)
-                                <span class="course-tag level-{{ strtolower($course->level) }}">{{ $course->level }}</span>
-                            @endif
-                            <span class="course-tag" style="{{ $enrollmentStatus['tone'] === 'closed' ? 'background:rgba(198,40,40,0.12);color:#9f1d26;' : ($enrollmentStatus['tone'] === 'closing' ? 'background:rgba(217,119,6,0.14);color:#b45309;' : 'background:rgba(22,163,74,0.12);color:#166534;') }}">
-                                {{ $enrollmentStatus['label'] }}
-                            </span>
-                        </div>
-                        <h3>{{ $course->title }}</h3>
-                        <p>{{ $course->short_description ?: Str::limit(strip_tags($course->description), 110) }}</p>
-                        <div class="d-flex align-items-center justify-content-between mt-auto mb-3 flex-wrap gap-1">
-                            @if($course->duration_weeks)
-                                <small style="color:var(--text-muted);"><i class="fas fa-clock me-1"></i>{{ $course->duration_weeks }} weeks</small>
-                            @endif
-                            <span class="course-fee">
-                                {{ $course->fee ? 'UGX ' . number_format($course->fee) : 'Free' }}
-                            </span>
-                        </div>
-                        <a href="{{ route('courses.show', $course->slug) }}"
-                           class="btn btn-primary btn-sm w-100">
-                            View Course
-                        </a>
-                    </div>
-                </div>
+                <x-frontend.course-card
+                    :image="$course->image ? asset('storage/' . $course->image) : asset('images/courses/programming.png')"
+                    :title="$course->title"
+                    :desc="$course->short_description ?: Str::limit(strip_tags($course->description), 110)"
+                    :duration="$course->duration_weeks ? $course->duration_weeks . ' Weeks' : ''"
+                    :level="$course->level ?: ''"
+                    :enrollment-status="$course->enrollmentStatus()"
+                    :fee="$course->fee ? 'UGX ' . number_format($course->fee) : 'Free'"
+                    action-label="View Course"
+                    :slug="$course->slug" />
             @empty
                 <p class="no-courses">No courses found in this category.</p>
             @endforelse
