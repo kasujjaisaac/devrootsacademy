@@ -6,6 +6,8 @@
     <meta name="description" content="@yield('meta_description', 'DevRoots Academy — Empowering IT innovators in Masaka with practical, hands-on tech education.')">
 
     <title>@yield('title', 'DevRoots Academy')</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/logo-square.png') }}">
+    <link rel="shortcut icon" href="{{ asset('images/logo-square.png') }}">
 
     {{-- Bootstrap 5.3 --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
