@@ -14,6 +14,8 @@ class UserChatController extends Controller
     // List all chats for the logged-in user
     public function index()
     {
+        $student = Auth::user()?->student;
+
         $chats = Chat::where('user_id', Auth::id())
             ->withCount([
                 'messages as unread_count' => fn ($query) => $query
@@ -30,7 +32,7 @@ class UserChatController extends Controller
             'message' => request()->query('message'),
         ];
 
-        return view('frontend.chat.index', compact('chats', 'prefill'));
+        return view('frontend.chat.index', compact('chats', 'prefill', 'student'));
     }
 
     public function start(Request $request)
@@ -64,6 +66,8 @@ class UserChatController extends Controller
     // Show a chat thread
     public function show($id)
     {
+        $student = Auth::user()?->student;
+
         $chat = Chat::with(['messages.sender', 'admin'])
             ->where('user_id', Auth::id())
             ->findOrFail($id);
@@ -78,7 +82,7 @@ class UserChatController extends Controller
         if (request()->ajax()) {
             return view('frontend.chat._messages', compact('chat'))->render();
         }
-        return view('frontend.chat.show', compact('chat'));
+        return view('frontend.chat.show', compact('chat', 'student'));
     }
 
     // Send a message in a chat

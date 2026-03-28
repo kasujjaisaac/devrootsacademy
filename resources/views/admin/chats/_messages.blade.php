@@ -1,11 +1,19 @@
-@foreach($chat->messages as $message)
-    <div class="flex {{ $message->is_admin ? 'justify-end' : 'justify-start' }}">
-        <div class="max-w-xs px-4 py-2 rounded-lg {{ $message->is_admin ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' }}">
-            <div class="text-xs text-gray-400 mb-1">
-                {{ $message->sender->full_name ?? $message->sender->name ?? 'User' }}
-                • {{ $message->created_at->diffForHumans() }}
+@forelse($chat->messages as $message)
+    <article class="ad-thread-message {{ $message->is_admin ? 'from-admin' : 'from-student' }}">
+        <div class="ad-thread-bubble">
+            <div class="ad-thread-meta-line">
+                <span>
+                    {{ $message->sender->full_name ?? $message->sender->name ?? 'User' }}
+                    {{ $message->is_admin ? '• Admin' : '• Student' }}
+                </span>
+                <span>{{ $message->created_at->diffForHumans() }}</span>
             </div>
-            <div>{{ $message->message }}</div>
+            <p>{{ $message->message }}</p>
         </div>
+    </article>
+@empty
+    <div class="ad-thread-empty">
+        <i class="fas fa-comments"></i>
+        <p>No messages yet.</p>
     </div>
-@endforeach
+@endforelse
