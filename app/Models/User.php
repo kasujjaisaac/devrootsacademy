@@ -72,7 +72,13 @@ class User extends Authenticatable
 
     public function permissionSlugs(): Collection
     {
-        if (! Schema::hasTable('roles') || ! Schema::hasTable('permissions')) {
+        if (
+            ! Schema::hasTable('roles') ||
+            ! Schema::hasTable('permissions') ||
+            ! Schema::hasTable('role_user') ||
+            ! Schema::hasTable('permission_role') ||
+            ! Schema::hasTable('permission_user')
+        ) {
             return collect();
         }
 
@@ -91,7 +97,7 @@ class User extends Authenticatable
 
     public function hasRole(string $slug): bool
     {
-        if (! Schema::hasTable('roles')) {
+        if (! Schema::hasTable('roles') || ! Schema::hasTable('role_user')) {
             return $this->role === $slug;
         }
 
@@ -106,7 +112,13 @@ class User extends Authenticatable
             return true;
         }
 
-        if (! Schema::hasTable('roles') || ! Schema::hasTable('permissions')) {
+        if (
+            ! Schema::hasTable('roles') ||
+            ! Schema::hasTable('permissions') ||
+            ! Schema::hasTable('role_user') ||
+            ! Schema::hasTable('permission_role') ||
+            ! Schema::hasTable('permission_user')
+        ) {
             return false;
         }
 
@@ -124,7 +136,7 @@ class User extends Authenticatable
 
     public function primaryRoleName(): string
     {
-        if (! Schema::hasTable('roles')) {
+        if (! Schema::hasTable('roles') || ! Schema::hasTable('role_user')) {
             return ucfirst(str_replace('_', ' ', $this->role ?? 'admin'));
         }
 
