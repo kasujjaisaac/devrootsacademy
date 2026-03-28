@@ -49,6 +49,7 @@
                     <th class="cell-sm">#</th>
                     <th>Title</th>
                     <th>Category</th>
+                    <th>Enrollment Closes</th>
                     <th>Fee (UGX)</th>
                     <th class="cell-action">Actions</th>
                 </tr>
@@ -59,6 +60,16 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $course->title }}</td>
                     <td>{{ $course->category ?? '-' }}</td>
+                    <td>
+                        @if($course->enrollment_close_date)
+                            <div>{{ $course->enrollment_close_date->format('M d, Y') }}</div>
+                            <div style="font-size:0.75rem;color:{{ $course->enrollment_close_date->isPast() ? '#b42318' : 'var(--ad-muted)' }};">
+                                {{ $course->enrollment_close_date->isPast() ? 'Closed' : 'Open' }}
+                            </div>
+                        @else
+                            <span style="color:var(--ad-muted);">Not set</span>
+                        @endif
+                    </td>
                     <td>
                         @if($course->fee)
                             UGX {{ number_format($course->fee, 0) }}
@@ -87,7 +98,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="ad-table-empty">
+                    <td colspan="6" class="ad-table-empty">
                         <i class="fas fa-book-open"></i>
                         No courses found. <a href="{{ route('admin.courses.create') }}" style="color:var(--ad-primary);">Add a course</a>
                     </td>

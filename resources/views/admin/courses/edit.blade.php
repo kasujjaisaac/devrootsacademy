@@ -432,6 +432,15 @@
                     @error('schedule')<p class="ad-error">{{ $message }}</p>@enderror
                 </div>
 
+                <div class="ad-form-group" style="margin-top:16px;margin-bottom:0;">
+                    <label class="ad-label">Enrollment Close Date</label>
+                    <input type="date" name="enrollment_close_date"
+                           class="ad-input {{ $errors->has('enrollment_close_date') ? 'is-invalid' : '' }}"
+                           value="{{ old('enrollment_close_date', optional($course->enrollment_close_date)->format('Y-m-d')) }}">
+                    <p class="ad-input-hint">Applications will close automatically after this date.</p>
+                    @error('enrollment_close_date')<p class="ad-error">{{ $message }}</p>@enderror
+                </div>
+
             </div>
         </div>{{-- /Details --}}
 

@@ -108,6 +108,7 @@
                     :desc="$course->short_description ?: Str::limit($course->description, 100)"
                     :duration="$course->duration_weeks ? $course->duration_weeks . ' Weeks' : ''"
                     :level="$course->level ?: ''"
+                    :enrollment-status="$course->enrollmentStatus()"
                     :slug="$course->slug" />
             @empty
                 <p class="no-courses text-center">No active courses are available yet.</p>

@@ -8,6 +8,7 @@
 {{-- ===== PAGE HERO ===== --}}
 <section class="page-hero">
     <div class="container">
+        @php($enrollmentStatus = $course->enrollmentStatus())
         <div class="d-flex flex-wrap gap-2 mb-3">
             @if($course->category)
                 <span class="badge" style="background:var(--primary);color:#fff;padding:6px 14px;font-size:0.8rem;">{{ $course->category }}</span>
@@ -15,6 +16,7 @@
             @if($course->level)
                 <span class="badge" style="background:rgba(255,255,255,0.2);color:#fff;padding:6px 14px;font-size:0.8rem;">{{ $course->level }}</span>
             @endif
+            <span class="badge" style="background:{{ $enrollmentStatus['tone'] === 'closed' ? 'rgba(198,40,40,0.18)' : ($enrollmentStatus['tone'] === 'closing' ? 'rgba(217,119,6,0.2)' : 'rgba(22,163,74,0.18)') }};color:#fff;padding:6px 14px;font-size:0.8rem;">{{ $enrollmentStatus['label'] }}</span>
         </div>
         <h1>{{ $course->title }}</h1>
         @if($course->short_description)
@@ -35,7 +37,7 @@
     <div class="container">
 
         {{-- Course meta strip --}}
-        @if($course->duration_weeks || $course->schedule || $course->mode)
+        @if($course->duration_weeks || $course->schedule || $course->mode || $course->enrollment_close_date)
         <div class="d-flex flex-wrap gap-4 mb-4 p-3" style="background:var(--surface);border:1px solid var(--border);">
             @if($course->duration_weeks)
             <div class="d-flex align-items-center gap-2">
@@ -55,6 +57,10 @@
                 <span style="font-size:0.875rem;"><strong>Mode:</strong> {{ $course->mode }}</span>
             </div>
             @endif
+            <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-calendar-xmark text-primary"></i>
+                <span style="font-size:0.875rem;"><strong>{{ $enrollmentStatus['label'] }}:</strong> {{ $enrollmentStatus['message'] }}</span>
+            </div>
         </div>
         @endif
 
@@ -112,6 +118,11 @@
                 <a href="{{ route('apply.now') }}" class="btn btn-primary w-100 mt-4">
                     <i class="fas fa-paper-plane me-2"></i>Apply Now
                 </a>
+                @if($course->enrollment_close_date)
+                    <p style="margin:12px 0 0;font-size:0.8rem;color:var(--text-muted);text-align:center;">
+                        {{ $enrollmentStatus['message'] }}.
+                    </p>
+                @endif
             </div>
 
             {{-- Course Outline --}}

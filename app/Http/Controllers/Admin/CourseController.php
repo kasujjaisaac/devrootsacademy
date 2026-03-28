@@ -35,6 +35,7 @@ class CourseController extends Controller
             'level'             => 'nullable|in:Beginner,Intermediate,Advanced',
             'duration_weeks'    => 'nullable|integer|min:1',
             'schedule'          => 'nullable|string|max:200',
+            'enrollment_close_date' => 'nullable|date',
             'mode'              => 'nullable|in:online,in-person,hybrid',
         ]);
 
@@ -55,6 +56,7 @@ class CourseController extends Controller
                 'level'             => $request->level,
                 'duration_weeks'    => $request->duration_weeks,
                 'schedule'          => $request->schedule,
+                'enrollment_close_date' => $request->enrollment_close_date,
                 'mode'              => $request->mode,
                 'is_featured'       => $request->boolean('is_featured'),
                 'is_active'         => $request->boolean('is_active'),
@@ -94,6 +96,7 @@ class CourseController extends Controller
             'level'             => 'nullable|in:Beginner,Intermediate,Advanced',
             'duration_weeks'    => 'nullable|integer|min:1',
             'schedule'          => 'nullable|string|max:200',
+            'enrollment_close_date' => 'nullable|date',
             'mode'              => 'nullable|in:online,in-person,hybrid',
         ]);
 
@@ -110,6 +113,7 @@ class CourseController extends Controller
             'level'             => $request->level,
             'duration_weeks'    => $request->duration_weeks,
             'schedule'          => $request->schedule,
+            'enrollment_close_date' => $request->enrollment_close_date,
             'mode'              => $request->mode,
             'is_featured'       => $request->boolean('is_featured'),
             'is_active'         => $request->boolean('is_active'),

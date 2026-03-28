@@ -54,6 +54,15 @@
                              loading="lazy">
                     </div>
                     <div class="course-card-body">
+                        @php($enrollmentStatus = $course->enrollmentStatus())
+                        <div class="course-meta-tags" style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;">
+                            @if($course->level)
+                                <span class="course-tag level-{{ strtolower($course->level) }}">{{ $course->level }}</span>
+                            @endif
+                            <span class="course-tag" style="{{ $enrollmentStatus['tone'] === 'closed' ? 'background:rgba(198,40,40,0.12);color:#9f1d26;' : ($enrollmentStatus['tone'] === 'closing' ? 'background:rgba(217,119,6,0.14);color:#b45309;' : 'background:rgba(22,163,74,0.12);color:#166534;') }}">
+                                {{ $enrollmentStatus['label'] }}
+                            </span>
+                        </div>
                         <h3>{{ $course->title }}</h3>
                         <p>{{ $course->short_description ?: Str::limit(strip_tags($course->description), 110) }}</p>
                         <div class="d-flex align-items-center justify-content-between mt-auto mb-3 flex-wrap gap-1">

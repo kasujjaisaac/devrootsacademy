@@ -221,7 +221,7 @@
                                             @foreach($courses as $course)
                                                 <option value="{{ $course->id }}"
                                                     {{ (string) old('course_id') === (string) $course->id ? 'selected' : '' }}>
-                                                    {{ $course->title }}
+                                                    {{ $course->title }}{{ $course->enrollment_close_date ? ' — closes '.$course->enrollment_close_date->format('M d, Y') : '' }}
                                                 </option>
                                             @endforeach
                                         </select>

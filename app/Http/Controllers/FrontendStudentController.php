@@ -17,7 +17,16 @@ class FrontendStudentController extends Controller
 {
     public function showForm()
     {
-        $courses = Course::where('is_active', true)->orderBy('title')->get(['id', 'title']);
+        $courses = Course::query()
+            ->where('is_active', true)
+            ->where(function ($query) {
+                $query->whereNull('enrollment_close_date')
+                    ->orWhereDate('enrollment_close_date', '>=', now()->toDateString());
+            })
+            ->orderBy('enrollment_close_date')
+            ->orderBy('title')
+            ->get(['id', 'title', 'enrollment_close_date']);
+
         return view('frontend.apply-now', compact('courses'));
     }
 
@@ -61,6 +70,16 @@ class FrontendStudentController extends Controller
             'course_id.required'        => 'Please select a course you are interested in.',
         ]);
 
+        $course = Course::query()->findOrFail($validated['course_id']);
+
+        if ($course->enrollment_close_date && $course->enrollment_close_date->isPast()) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'course_id' => 'Applications for '.$course->title.' are currently closed.',
+                ]);
+        }
+
         $application = StudentApplication::create([
             'full_name'       => $validated['full_name'],
             'username'        => $validated['username'] ?? null,
@@ -68,7 +87,7 @@ class FrontendStudentController extends Controller
             'phone'           => $validated['phone'],
             'dob'             => $validated['dob'] ?? null,
             'location'        => $validated['location'] ?? null,
-            'course_id'       => $validated['course_id'],
+            'course_id'       => $course->id,
             'goals'           => $validated['goals'] ?? null,
             'agreed_terms'    => true,
             'status'          => StudentApplication::STATUS_SUBMITTED,
