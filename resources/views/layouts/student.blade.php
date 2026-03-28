@@ -229,6 +229,12 @@
                     </a>
                 </li>
 
+                <li class="ad-nav-item {{ request()->routeIs('student.recordings') ? 'active' : '' }}">
+                    <a href="{{ route('student.recordings') }}">
+                        <i class="fas fa-circle-play"></i> Lecture Recordings
+                    </a>
+                </li>
+
                 <li class="ad-nav-item {{ request()->routeIs('user.chat.*') ? 'active' : '' }}">
                     <a href="{{ route('user.chat.index') }}">
                         <i class="fas fa-comments"></i> Messages
@@ -287,6 +293,9 @@
                         </a>
                         <a href="{{ route('student.payments') }}">
                             <i class="fas fa-credit-card"></i> Payments
+                        </a>
+                        <a href="{{ route('student.recordings') }}">
+                            <i class="fas fa-circle-play"></i> Lecture Recordings
                         </a>
                         <hr>
                         <form method="POST" action="{{ route('logout') }}">

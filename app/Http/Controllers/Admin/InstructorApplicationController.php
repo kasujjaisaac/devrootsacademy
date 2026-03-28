@@ -9,6 +9,7 @@ use App\Mail\InstructorApplicationRejectedMail;
 use App\Mail\InstructorApplicationUnderReviewMail;
 use App\Models\Instructor;
 use App\Models\InstructorApplication;
+use App\Support\AuditLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -62,6 +63,7 @@ class InstructorApplicationController extends Controller
         ]);
 
         $this->sendEmailIfPossible($instructorApplication->fresh(), new InstructorApplicationUnderReviewMail($instructorApplication->fresh()));
+        $this->logAction($request, $instructorApplication, 'instructor_application.reviewed', 'Marked instructor application as under review.');
 
         return back()->with('success', 'Instructor application marked as under review.');
     }
@@ -81,6 +83,7 @@ class InstructorApplicationController extends Controller
         ]);
 
         $this->sendEmailIfPossible($instructorApplication->fresh(), new InstructorApplicationAcceptedMail($instructorApplication->fresh()));
+        $this->logAction($request, $instructorApplication, 'instructor_application.accepted', 'Accepted instructor application.');
 
         return back()->with('success', 'Instructor application accepted.');
     }
@@ -102,6 +105,7 @@ class InstructorApplicationController extends Controller
         ]);
 
         $this->sendEmailIfPossible($instructorApplication->fresh(), new InstructorApplicationRejectedMail($instructorApplication->fresh()));
+        $this->logAction($request, $instructorApplication, 'instructor_application.rejected', 'Rejected instructor application.');
 
         return back()->with('success', 'Instructor application rejected.');
     }
@@ -132,6 +136,7 @@ class InstructorApplicationController extends Controller
         ]);
 
         $this->sendEmailIfPossible($instructorApplication->fresh(), new InstructorActivationConfirmedMail($instructorApplication->fresh()));
+        $this->logAction($request, $instructorApplication->fresh(['instructor']), 'instructor_application.activated', 'Activated instructor application and added instructor to roster.');
 
         return back()->with('success', 'Instructor activated and added to the instructor roster.');
     }
@@ -145,5 +150,21 @@ class InstructorApplicationController extends Controller
         rescue(function () use ($application, $mailable) {
             Mail::to($application->email)->send($mailable);
         }, report: true);
+    }
+
+    protected function logAction(Request $request, InstructorApplication $application, string $action, string $description): void
+    {
+        AuditLogger::log(
+            $action,
+            $description,
+            actor: $request->user(),
+            metadata: [
+                'application_id' => $application->id,
+                'status' => $application->status,
+                'applicant' => $application->full_name,
+                'email' => $application->email,
+            ],
+            request: $request,
+        );
     }
 }

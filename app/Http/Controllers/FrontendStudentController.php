@@ -6,6 +6,9 @@ use App\Mail\AdminNewStudentApplicationMail;
 use App\Mail\StudentApplicationSubmittedMail;
 use App\Models\Course;
 use App\Models\StudentApplication;
+use App\Notifications\AdminActivityNotification;
+use App\Support\AccessControl;
+use App\Support\AdminNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
@@ -85,6 +88,16 @@ class FrontendStudentController extends Controller
                 Mail::to($admissionsAddress)->send(new AdminNewStudentApplicationMail($application->load('course')));
             }, report: true);
         }
+
+        AdminNotifier::sendToPermission(
+            AccessControl::MANAGE_STUDENT_APPLICATIONS,
+            new AdminActivityNotification(
+                'New student application',
+                $application->full_name.' submitted an application for '.($application->course?->title ?? 'a course').'.',
+                route('admin.student-applications.show', $application),
+                ['type' => 'student_application', 'application_id' => $application->id],
+            )
+        );
 
         return redirect()->back()->with(
             'success',

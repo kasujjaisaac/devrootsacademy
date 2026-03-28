@@ -39,9 +39,9 @@
       </div>
       <div class="ad-form-group">
         <label class="ad-label">Role</label>
-        <input type="text" class="ad-input" value="{{ Auth::user()->role ?? 'admin' }}" readonly>
+        <input type="text" class="ad-input" value="{{ Auth::user()->primaryRoleName() }}" readonly>
       </div>
-      <p class="ad-input-hint">To update account details, use the database directly or implement a profile update feature.</p>
+      <p class="ad-input-hint">Staff access is now managed through roles and module permissions.</p>
     </div>
   </div>
 
@@ -78,18 +78,31 @@
   </div>
   <div class="ad-card-body">
     <div style="display:flex;gap:12px;flex-wrap:wrap">
+      @if(Auth::user()->hasPermission(\App\Support\AccessControl::MANAGE_STUDENTS))
       <a href="{{ route('admin.students.index') }}" class="btn-ad btn-ad-outline">
         <i class="fas fa-user-graduate"></i> Manage Students
       </a>
+      @endif
+      @if(Auth::user()->hasPermission(\App\Support\AccessControl::MANAGE_COURSES))
       <a href="{{ route('admin.courses.index') }}" class="btn-ad btn-ad-outline">
         <i class="fas fa-book-open"></i> Manage Courses
       </a>
+      @endif
+      @if(Auth::user()->hasPermission(\App\Support\AccessControl::MANAGE_INSTRUCTORS))
       <a href="{{ route('admin.instructors.index') }}" class="btn-ad btn-ad-outline">
         <i class="fas fa-chalkboard-teacher"></i> Manage Instructors
       </a>
+      @endif
+      @if(Auth::user()->hasPermission(\App\Support\AccessControl::VIEW_REPORTS))
       <a href="{{ route('admin.reports.index') }}" class="btn-ad btn-ad-outline">
         <i class="fas fa-chart-bar"></i> View Reports
       </a>
+      @endif
+      @if(Auth::user()->hasPermission(\App\Support\AccessControl::MANAGE_STAFF_USERS))
+      <a href="{{ route('admin.staff-users.index') }}" class="btn-ad btn-ad-outline">
+        <i class="fas fa-user-shield"></i> Staff Access
+      </a>
+      @endif
     </div>
   </div>
 </div>

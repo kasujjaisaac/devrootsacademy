@@ -7,6 +7,7 @@ use App\Models\Payment;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Student;
+use App\Support\AuditLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -66,7 +67,7 @@ class PaymentController extends Controller
                 ]);
         }
 
-        Payment::create([
+        $payment = Payment::create([
             'student_id' => $validated['student_id'],
             'course_id' => $validated['course_id'],
             'amount' => $validated['amount'],
@@ -82,6 +83,21 @@ class PaymentController extends Controller
                 ? ($validated['paid_at'] ?? now())
                 : ($validated['paid_at'] ?? null),
         ]);
+
+        $payment->load(['student.user', 'course']);
+        AuditLogger::log(
+            'payment.created',
+            'Recorded a manual payment.',
+            actor: $request->user(),
+            targetUser: $payment->student?->user,
+            metadata: [
+                'payment_id' => $payment->id,
+                'amount' => $payment->amount,
+                'status' => $payment->status,
+                'course' => $payment->course?->title,
+            ],
+            request: $request,
+        );
 
         return redirect()->route('admin.payments.index')->with('success', 'Payment recorded successfully.');
     }

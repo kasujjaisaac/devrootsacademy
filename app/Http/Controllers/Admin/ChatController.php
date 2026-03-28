@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
 use App\Models\Message;
+use App\Support\AuditLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -62,6 +63,8 @@ class ChatController extends Controller
         $chat->resolved_at = null;
         $chat->last_message_at = now();
         $chat->save();
+        $chat->load('user');
+        $this->logAction($request, $chat, 'chat.admin_replied', 'Admin replied in support conversation.');
 
         return redirect()->route('admin.chats.show', $chat->id)->with('success', 'Message sent!');
     }
@@ -76,6 +79,8 @@ class ChatController extends Controller
         $chat->status = $request->status;
         $chat->resolved_at = $request->status === Chat::STATUS_RESOLVED ? now() : null;
         $chat->save();
+        $chat->load('user');
+        $this->logAction($request, $chat, 'chat.status_updated', 'Updated support conversation status.');
 
         return redirect()->route('admin.chats.show', $chat->id)->with('success', 'Conversation status updated.');
     }
@@ -85,7 +90,25 @@ class ChatController extends Controller
         $chat = Chat::findOrFail($id);
         $chat->admin_id = Auth::id();
         $chat->save();
+        $chat->load('user');
+        $this->logAction(request(), $chat, 'chat.assigned', 'Assigned support conversation.');
 
         return redirect()->route('admin.chats.show', $chat->id)->with('success', 'Conversation assigned to you.');
+    }
+
+    protected function logAction(Request $request, Chat $chat, string $action, string $description): void
+    {
+        AuditLogger::log(
+            $action,
+            $description,
+            actor: $request->user(),
+            targetUser: $chat->user,
+            metadata: [
+                'chat_id' => $chat->id,
+                'reference' => $chat->reference,
+                'status' => $chat->status,
+            ],
+            request: $request,
+        );
     }
 }

@@ -69,6 +69,30 @@
     </div>
 </div>
 
+@if($actionCards->isNotEmpty())
+<div class="ad-card" style="margin-bottom:20px;">
+    <div class="ad-card-head">
+        <h3><i class="fas fa-bolt" style="color:var(--ad-primary);margin-right:6px;"></i> Action Needed</h3>
+    </div>
+    <div class="ad-card-body">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+            @foreach($actionCards as $card)
+                <a href="{{ $card['route'] }}" style="display:block;padding:18px;border:1px solid var(--ad-border);border-radius:16px;background:#fff;text-decoration:none;color:inherit;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
+                        <span style="width:40px;height:40px;border-radius:14px;background:rgba(198,40,40,0.08);color:#C62828;display:flex;align-items:center;justify-content:center;">
+                            <i class="fas {{ $card['icon'] }}"></i>
+                        </span>
+                        <strong style="font-size:1.6rem;color:#14142b;">{{ number_format($card['count']) }}</strong>
+                    </div>
+                    <div style="font-weight:600;color:#14142b;margin-bottom:6px;">{{ $card['label'] }}</div>
+                    <div style="font-size:0.88rem;color:var(--ad-muted);line-height:1.55;">{{ $card['description'] }}</div>
+                </a>
+            @endforeach
+        </div>
+    </div>
+</div>
+@endif
+
 {{-- Charts Row --}}
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
     <div class="ad-card">

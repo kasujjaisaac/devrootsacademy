@@ -18,6 +18,7 @@
   @stack('styles')
 </head>
 <body>
+@php($adminUser = Auth::user())
 
 {{-- Mobile overlay --}}
 <div class="ad-overlay" id="adOverlay"></div>
@@ -48,7 +49,7 @@
       </div>
       <div>
         <div class="ad-sidebar-uname">{{ Auth::user()->name ?? 'Admin' }}</div>
-        <div class="ad-sidebar-role">Administrator</div>
+        <div class="ad-sidebar-role">{{ Auth::user()->primaryRoleName() }}</div>
       </div>
     </div>
     @endauth
@@ -56,89 +57,154 @@
     {{-- Navigation --}}
     <nav class="ad-nav">
       <ul>
+        @if($adminUser?->hasPermission(\App\Support\AccessControl::VIEW_DASHBOARD))
         <li class="ad-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
           <a href="{{ route('admin.dashboard') }}">
             <i class="fas fa-gauge-high"></i> Dashboard
           </a>
         </li>
+        @endif
 
+        @if(
+            $adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_STUDENTS) ||
+            $adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_STUDENT_APPLICATIONS) ||
+            $adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_COURSES) ||
+            $adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_LECTURE_RECORDINGS) ||
+            $adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_TIMETABLES) ||
+            $adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_PARTNERS) ||
+            $adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_INSTRUCTORS) ||
+            $adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_INSTRUCTOR_APPLICATIONS) ||
+            $adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_ENROLLMENTS)
+        )
         <li class="ad-nav-section">Academic</li>
+        @endif
 
+        @if($adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_STUDENTS))
         <li class="ad-nav-item {{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
           <a href="{{ route('admin.students.index') }}">
             <i class="fas fa-user-graduate"></i> Students
           </a>
         </li>
+        @endif
 
+        @if($adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_STUDENT_APPLICATIONS))
         <li class="ad-nav-item {{ request()->routeIs('admin.student-applications.*') ? 'active' : '' }}">
           <a href="{{ route('admin.student-applications.index') }}">
             <i class="fas fa-file-signature"></i> Applications
           </a>
         </li>
+        @endif
 
+        @if($adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_COURSES))
         <li class="ad-nav-item {{ request()->routeIs('admin.courses.*') ? 'active' : '' }}">
           <a href="{{ route('admin.courses.index') }}">
             <i class="fas fa-book-open"></i> Courses
           </a>
         </li>
+        @endif
 
+        @if($adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_LECTURE_RECORDINGS))
+        <li class="ad-nav-item {{ request()->routeIs('admin.lecture-recordings.*') ? 'active' : '' }}">
+          <a href="{{ route('admin.lecture-recordings.index') }}">
+            <i class="fas fa-circle-play"></i> Lecture Recordings
+          </a>
+        </li>
+        @endif
+
+        @if($adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_TIMETABLES))
         <li class="ad-nav-item {{ request()->routeIs('admin.timetables.*') ? 'active' : '' }}">
           <a href="{{ route('admin.timetables.index') }}">
             <i class="fas fa-calendar-days"></i> Timetables
           </a>
         </li>
+        @endif
 
+        @if($adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_PARTNERS))
         <li class="ad-nav-item {{ request()->routeIs('admin.partners.*') ? 'active' : '' }}">
           <a href="{{ route('admin.partners.index') }}">
             <i class="fas fa-handshake"></i> Partners
           </a>
         </li>
+        @endif
 
+        @if($adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_INSTRUCTORS))
         <li class="ad-nav-item {{ request()->routeIs('admin.instructors.*') ? 'active' : '' }}">
           <a href="{{ route('admin.instructors.index') }}">
             <i class="fas fa-chalkboard-teacher"></i> Instructors
           </a>
         </li>
+        @endif
 
+        @if($adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_INSTRUCTOR_APPLICATIONS))
         <li class="ad-nav-item {{ request()->routeIs('admin.instructor-applications.*') ? 'active' : '' }}">
           <a href="{{ route('admin.instructor-applications.index') }}">
             <i class="fas fa-user-check"></i> Instructor Apps
           </a>
         </li>
+        @endif
 
+        @if($adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_ENROLLMENTS))
         <li class="ad-nav-item {{ request()->routeIs('admin.enrollments.*') ? 'active' : '' }}">
           <a href="{{ route('admin.enrollments.index') }}">
             <i class="fas fa-layer-group"></i> Enrollments
           </a>
         </li>
+        @endif
 
+        @if(
+            $adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_PAYMENTS) ||
+            $adminUser?->hasPermission(\App\Support\AccessControl::VIEW_REPORTS)
+        )
         <li class="ad-nav-section">Finance</li>
+        @endif
 
+        @if($adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_PAYMENTS))
         <li class="ad-nav-item {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
           <a href="{{ route('admin.payments.index') }}">
             <i class="fas fa-credit-card"></i> Payments
           </a>
         </li>
+        @endif
 
+        @if($adminUser?->hasPermission(\App\Support\AccessControl::VIEW_REPORTS))
         <li class="ad-nav-item {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
           <a href="{{ route('admin.reports.index') }}">
             <i class="fas fa-chart-bar"></i> Reports
           </a>
         </li>
+        @endif
 
+        @if(
+            $adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_MESSAGES) ||
+            $adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_STAFF_USERS) ||
+            $adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_SETTINGS)
+        )
         <li class="ad-nav-section">System</li>
+        @endif
 
+        @if($adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_MESSAGES))
         <li class="ad-nav-item {{ request()->routeIs('admin.chats.*') ? 'active' : '' }}">
           <a href="{{ route('admin.chats.index') }}">
             <i class="fas fa-comments"></i> Messages
           </a>
         </li>
+        @endif
 
+        @if($adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_STAFF_USERS))
+        <li class="ad-nav-item {{ request()->routeIs('admin.staff-users.*') ? 'active' : '' }}">
+          <a href="{{ route('admin.staff-users.index') }}">
+            <i class="fas fa-user-shield"></i> Staff Access
+          </a>
+        </li>
+        @endif
+
+        @if($adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_SETTINGS))
         <li class="ad-nav-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
           <a href="{{ route('admin.settings.index') }}">
             <i class="fas fa-gear"></i> Settings
           </a>
         </li>
+        @endif
       </ul>
     </nav>
 
@@ -171,6 +237,16 @@
         <span class="ad-page-title">@yield('title', 'Dashboard')</span>
       </div>
       <div class="ad-topbar-right">
+        <a href="{{ route('admin.notifications.index') }}" class="ad-topbar-btn" style="position:relative;">
+          <i class="fas fa-bell"></i>
+          <span>Alerts</span>
+          @if($adminUser?->unreadAdminNotificationsCount())
+            <span style="position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:#C62828;color:#fff;font-size:0.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;">
+              {{ $adminUser->unreadAdminNotificationsCount() > 99 ? '99+' : $adminUser->unreadAdminNotificationsCount() }}
+            </span>
+          @endif
+        </a>
+
         <a href="{{ route('home') }}" class="ad-topbar-btn" target="_blank">
           <i class="fas fa-arrow-up-right-from-square"></i>
           <span>View Site</span>
@@ -186,10 +262,12 @@
             <i class="fas fa-chevron-down ad-user-caret"></i>
           </div>
           <div class="ad-user-dropdown">
+            @if($adminUser?->hasPermission(\App\Support\AccessControl::MANAGE_SETTINGS))
             <a href="{{ route('admin.settings.index') }}">
               <i class="fas fa-gear"></i> Settings
             </a>
             <hr>
+            @endif
             <form method="POST" action="{{ route('admin.logout') }}">
               @csrf
               <button type="submit" class="danger">

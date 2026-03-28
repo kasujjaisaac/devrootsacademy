@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Mail\AdminStudentPaymentReceivedMail;
 use App\Models\Payment;
+use App\Notifications\AdminActivityNotification;
 use App\Services\PesapalService;
+use App\Support\AccessControl;
+use App\Support\AdminNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -189,6 +192,18 @@ class StudentPaymentController extends Controller
                     Mail::to($paymentsAddress)->send(new AdminStudentPaymentReceivedMail($payment->fresh(['student', 'course'])));
                 }, report: true);
             }
+
+            $payment->loadMissing(['student', 'course']);
+
+            AdminNotifier::sendToPermission(
+                AccessControl::MANAGE_PAYMENTS,
+                new AdminActivityNotification(
+                    'Student payment received',
+                    ($payment->student?->full_name ?? 'A student').' completed a payment for '.($payment->course?->title ?? 'a course').'.',
+                    route('admin.payments.index'),
+                    ['type' => 'payment', 'payment_id' => $payment->id],
+                )
+            );
         }
 
         return true;

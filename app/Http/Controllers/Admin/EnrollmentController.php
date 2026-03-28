@@ -7,6 +7,7 @@ use App\Mail\StudentCourseCompletedMail;
 use App\Models\Enrollment;
 use App\Models\Student;
 use App\Models\Course;
+use App\Support\AuditLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
@@ -34,8 +35,9 @@ class EnrollmentController extends Controller
         ]);
 
         $enrollment = Enrollment::create($request->only('student_id', 'course_id', 'status'));
-        $enrollment->load('student');
+        $enrollment->load(['student.user', 'course']);
         $enrollment->student?->syncLifecycleStatus();
+        $this->logAction($request, $enrollment, 'enrollment.created', 'Created enrollment.');
 
         return redirect()->route('admin.enrollments.index')
                          ->with('success', 'Enrollment created successfully.');
@@ -67,16 +69,37 @@ class EnrollmentController extends Controller
             }, report: true);
         }
 
+        $this->logAction($request, $enrollment, 'enrollment.updated', 'Updated enrollment status.');
+
         return redirect()->route('admin.enrollments.index')
                          ->with('success', 'Enrollment updated successfully.');
     }
 
     public function destroy(Enrollment $enrollment)
     {
+        $enrollment->load(['student.user', 'course']);
         $student = $enrollment->student;
+        $this->logAction(request(), $enrollment, 'enrollment.deleted', 'Deleted enrollment.');
         $enrollment->delete();
         $student?->syncLifecycleStatus();
         return redirect()->route('admin.enrollments.index')
                          ->with('success', 'Enrollment deleted.');
+    }
+
+    protected function logAction(Request $request, Enrollment $enrollment, string $action, string $description): void
+    {
+        AuditLogger::log(
+            $action,
+            $description,
+            actor: $request->user(),
+            targetUser: $enrollment->student?->user,
+            metadata: [
+                'enrollment_id' => $enrollment->id,
+                'status' => $enrollment->status,
+                'course' => $enrollment->course?->title,
+                'student' => $enrollment->student?->full_name,
+            ],
+            request: $request,
+        );
     }
 }

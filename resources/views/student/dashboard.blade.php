@@ -14,6 +14,7 @@
                 <span class="sp-chip"><i class="fas fa-id-badge"></i> {{ $student->student_number ?? 'Student number pending' }}</span>
                 <span class="sp-chip"><i class="fas fa-book-open"></i> {{ $stats['active_courses'] }} active course{{ $stats['active_courses'] === 1 ? '' : 's' }}</span>
                 <span class="sp-chip"><i class="fas fa-calendar-days"></i> {{ $events->count() }} upcoming item{{ $events->count() === 1 ? '' : 's' }}</span>
+                <span class="sp-chip"><i class="fas fa-circle-play"></i> {{ $stats['recordings'] }} recent recording{{ $stats['recordings'] === 1 ? '' : 's' }}</span>
             </div>
             @if($stats['balance'] > 0)
                 <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;">
@@ -110,5 +111,109 @@
         </div>
     </div>
 </div>
+
+<div class="ad-card sp-section-gap">
+    <div class="ad-card-head">
+        <h3>Lecture Recordings</h3>
+        <a href="{{ route('student.recordings') }}" class="btn-ad btn-ad-outline btn-ad-sm">
+            <i class="fas fa-circle-play"></i> View All
+        </a>
+    </div>
+    <div class="ad-card-body">
+        @if($lectureRecordings->isEmpty())
+            <div class="sp-empty">No lecture recordings have been added for your active course yet.</div>
+        @else
+            <div class="sp-recording-grid">
+                @foreach($lectureRecordings as $recording)
+                    <a href="{{ $recording->google_drive_url }}" target="_blank" rel="noopener noreferrer" class="sp-recording-card">
+                        <span class="sp-recording-date">{{ $recording->class_date->format('M d, Y') }}</span>
+                        <div class="sp-recording-icon">
+                            <i class="fas fa-circle-play"></i>
+                        </div>
+                        <div class="sp-recording-course">{{ $recording->course?->title ?? 'Course recording' }}</div>
+                        <h4>{{ $recording->title }}</h4>
+                        <p>{{ $recording->topic ?: 'Open this lecture recording in Google Drive.' }}</p>
+                    </a>
+                @endforeach
+            </div>
+        @endif
+    </div>
+</div>
+
+@push('styles')
+<style>
+    .sp-recording-grid{
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+        gap:16px;
+    }
+    .sp-recording-card{
+        position:relative;
+        display:block;
+        padding:18px;
+        border:1px solid rgba(195, 33, 48, 0.12);
+        border-radius:18px;
+        background:#fff;
+        text-decoration:none;
+        color:inherit;
+        transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        min-height:180px;
+        overflow:hidden;
+    }
+    .sp-recording-card:hover{
+        transform:translateY(-4px);
+        border-color:rgba(195, 33, 48, 0.28);
+        box-shadow:0 18px 34px rgba(20, 20, 43, 0.08);
+    }
+    .sp-recording-icon{
+        width:42px;
+        height:42px;
+        border-radius:14px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background:rgba(195, 33, 48, 0.08);
+        color:#c32130;
+        margin-bottom:16px;
+    }
+    .sp-recording-course{
+        font-size:.75rem;
+        font-weight:600;
+        letter-spacing:.04em;
+        text-transform:uppercase;
+        color:#a2353f;
+        margin-bottom:10px;
+    }
+    .sp-recording-card h4{
+        margin:0 0 8px;
+        font-size:1rem;
+        color:#14142b;
+    }
+    .sp-recording-card p{
+        margin:0;
+        color:#6b7280;
+        font-size:.9rem;
+        line-height:1.55;
+    }
+    .sp-recording-date{
+        position:absolute;
+        top:14px;
+        right:14px;
+        padding:6px 10px;
+        border-radius:999px;
+        background:#14142b;
+        color:#fff;
+        font-size:.72rem;
+        font-weight:600;
+        opacity:0;
+        transform:translateY(-6px);
+        transition:opacity .18s ease, transform .18s ease;
+    }
+    .sp-recording-card:hover .sp-recording-date{
+        opacity:1;
+        transform:translateY(0);
+    }
+</style>
+@endpush
 
 @endsection

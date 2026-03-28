@@ -8,7 +8,11 @@ use App\Models\Student;
 use App\Models\Course;
 use App\Models\Instructor;
 use App\Models\Enrollment;
+use App\Models\InstructorApplication;
+use App\Models\Message;
 use App\Models\Payment;
+use App\Models\StudentApplication;
+use App\Support\AccessControl;
 
 class DashboardController extends Controller
 {
@@ -68,6 +72,41 @@ class DashboardController extends Controller
                 ];
             });
 
+        $actionCards = collect([
+            [
+                'permission' => AccessControl::MANAGE_STUDENT_APPLICATIONS,
+                'count' => StudentApplication::where('status', StudentApplication::STATUS_SUBMITTED)->count(),
+                'label' => 'New student applications',
+                'description' => 'Applicants waiting for admissions review.',
+                'route' => route('admin.student-applications.index', ['status' => StudentApplication::STATUS_SUBMITTED]),
+                'icon' => 'fa-file-signature',
+            ],
+            [
+                'permission' => AccessControl::MANAGE_INSTRUCTOR_APPLICATIONS,
+                'count' => InstructorApplication::where('status', InstructorApplication::STATUS_SUBMITTED)->count(),
+                'label' => 'New instructor applications',
+                'description' => 'Instructor applications waiting for review.',
+                'route' => route('admin.instructor-applications.index', ['status' => InstructorApplication::STATUS_SUBMITTED]),
+                'icon' => 'fa-user-check',
+            ],
+            [
+                'permission' => AccessControl::MANAGE_MESSAGES,
+                'count' => Message::where('is_admin', false)->whereNull('read_at')->count(),
+                'label' => 'Unread student messages',
+                'description' => 'Support messages that still need an admin response.',
+                'route' => route('admin.chats.index'),
+                'icon' => 'fa-comments',
+            ],
+            [
+                'permission' => AccessControl::MANAGE_PAYMENTS,
+                'count' => Payment::where('status', Payment::STATUS_PENDING)->count(),
+                'label' => 'Pending payment records',
+                'description' => 'Payments still awaiting final confirmation.',
+                'route' => route('admin.payments.index'),
+                'icon' => 'fa-credit-card',
+            ],
+        ])->filter(fn (array $card) => $request->user()?->hasPermission($card['permission']))->values();
+
         // ===== PASS VARIABLES TO VIEW (old variable names) =====
         return view('admin.dashboard', [
             'students' => $students,
@@ -84,6 +123,7 @@ class DashboardController extends Controller
             'selectedCourse' => $selectedCourse,
             'activeStudents' => $activeStudents,
             'finishedStudents' => $finishedStudents,
+            'actionCards' => $actionCards,
         ]);
     }
 }

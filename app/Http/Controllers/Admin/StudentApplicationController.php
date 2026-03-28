@@ -11,6 +11,7 @@ use App\Models\Enrollment;
 use App\Models\Student;
 use App\Models\StudentApplication;
 use App\Models\User;
+use App\Support\AuditLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -67,6 +68,7 @@ class StudentApplicationController extends Controller
         ]);
 
         $this->sendEmailIfPossible($studentApplication->fresh(['course']), new StudentApplicationUnderReviewMail($studentApplication->fresh(['course'])));
+        $this->logAction($request, $studentApplication, 'student_application.reviewed', 'Marked student application as under review.');
 
         return back()->with('success', 'Application marked as under review.');
     }
@@ -111,6 +113,7 @@ class StudentApplicationController extends Controller
         });
 
         $this->sendEmailIfPossible($studentApplication->fresh(['course', 'student']), new StudentApplicationAcceptedMail($studentApplication->fresh(['course', 'student'])));
+        $this->logAction($request, $studentApplication->fresh(['course', 'student']), 'student_application.accepted', 'Accepted student application.');
 
         return back()->with('success', 'Application accepted and student number assigned.');
     }
@@ -132,6 +135,7 @@ class StudentApplicationController extends Controller
         ]);
 
         $this->sendEmailIfPossible($studentApplication->fresh(['course']), new StudentApplicationRejectedMail($studentApplication->fresh(['course'])));
+        $this->logAction($request, $studentApplication->fresh(['course']), 'student_application.rejected', 'Rejected student application.');
 
         return back()->with('success', 'Application rejected.');
     }
@@ -213,6 +217,7 @@ class StudentApplicationController extends Controller
 
         $this->sendEmailIfPossible($studentApplication->fresh(['course', 'enrollment.course']), new StudentEnrollmentConfirmedMail($studentApplication->fresh(['course', 'enrollment.course'])));
         rescue(fn () => Password::sendResetLink(['email' => $studentApplication->email]), report: true);
+        $this->logAction($request, $studentApplication->fresh(['course', 'student', 'enrollment']), 'student_application.enrolled', 'Converted accepted application into an active enrollment.');
 
         return back()->with('success', 'Application converted to an enrolled student successfully.');
     }
@@ -226,5 +231,22 @@ class StudentApplicationController extends Controller
         rescue(function () use ($application, $mailable) {
             Mail::to($application->email)->send($mailable);
         }, report: true);
+    }
+
+    protected function logAction(Request $request, StudentApplication $application, string $action, string $description): void
+    {
+        AuditLogger::log(
+            $action,
+            $description,
+            actor: $request->user(),
+            targetUser: $application->student?->user,
+            metadata: [
+                'application_id' => $application->id,
+                'status' => $application->status,
+                'course' => $application->course?->title,
+                'applicant' => $application->full_name,
+            ],
+            request: $request,
+        );
     }
 }

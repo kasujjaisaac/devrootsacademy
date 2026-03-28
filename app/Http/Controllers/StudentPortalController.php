@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\CalendarEvent;
+use App\Models\LectureRecording;
 use App\Models\Payment;
+use App\Models\Student;
 use Illuminate\Http\Request;
 
 class StudentPortalController extends Controller
@@ -13,6 +15,8 @@ class StudentPortalController extends Controller
         $student = $this->student($request);
         $events = $this->upcomingEvents($student);
         $payments = $student->payments()->with('course')->latest()->take(5)->get();
+        $lectureRecordings = $this->lectureRecordingsForStudent($student, 4);
+        $lectureRecordingCount = $this->lectureRecordingsForStudent($student)->count();
 
         $feeTotal = $student->enrollments->sum(fn($enrollment) => (int) ($enrollment->course?->fee ?? 0));
         $paidTotal = (int) $student->payments->where('status', Payment::STATUS_COMPLETED)->sum('amount');
@@ -21,12 +25,14 @@ class StudentPortalController extends Controller
             'student' => $student,
             'payments' => $payments,
             'events' => $events,
+            'lectureRecordings' => $lectureRecordings,
             'stats' => [
                 'enrollments' => $student->enrollments->count(),
                 'active_courses' => $student->enrollments->where('status', 'active')->count(),
                 'completed_courses' => $student->enrollments->where('status', 'completed')->count(),
                 'paid_total' => $paidTotal,
                 'balance' => max($feeTotal - $paidTotal, 0),
+                'recordings' => $lectureRecordingCount,
             ],
         ]);
     }
@@ -88,12 +94,52 @@ class StudentPortalController extends Controller
         ]);
     }
 
+    public function recordings(Request $request)
+    {
+        $student = $this->student($request);
+
+        return view('student.recordings', [
+            'student' => $student,
+            'recordings' => $this->lectureRecordingsForStudent($student),
+        ]);
+    }
+
     protected function student(Request $request)
     {
         return $request->user()
             ->student()
             ->with(['enrollments.course', 'payments.course'])
             ->firstOrFail();
+    }
+
+    protected function lectureRecordingsForStudent(Student $student, ?int $limit = null)
+    {
+        if ($student->status !== Student::STATUS_ACTIVE) {
+            return collect();
+        }
+
+        $courseIds = $student->enrollments
+            ->where('status', 'active')
+            ->pluck('course_id')
+            ->filter()
+            ->values();
+
+        if ($courseIds->isEmpty()) {
+            return collect();
+        }
+
+        $query = LectureRecording::query()
+            ->with('course')
+            ->where('is_published', true)
+            ->whereIn('course_id', $courseIds)
+            ->orderByDesc('class_date')
+            ->orderByDesc('id');
+
+        if ($limit) {
+            $query->limit($limit);
+        }
+
+        return $query->get();
     }
 
     protected function upcomingEvents($student, int $days = 45)

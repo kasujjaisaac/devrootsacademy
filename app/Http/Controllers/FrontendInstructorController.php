@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Mail\InstructorApplicationSubmittedMail;
 use App\Models\Course;
 use App\Models\InstructorApplication;
+use App\Notifications\AdminActivityNotification;
+use App\Support\AccessControl;
+use App\Support\AdminNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
@@ -62,6 +65,16 @@ class FrontendInstructorController extends Controller
         rescue(function () use ($application) {
             Mail::to($application->email)->send(new InstructorApplicationSubmittedMail($application));
         }, report: true);
+
+        AdminNotifier::sendToPermission(
+            AccessControl::MANAGE_INSTRUCTOR_APPLICATIONS,
+            new AdminActivityNotification(
+                'New instructor application',
+                $application->full_name.' submitted an instructor application.',
+                route('admin.instructor-applications.show', $application),
+                ['type' => 'instructor_application', 'application_id' => $application->id],
+            )
+        );
 
         return back()->with(
             'success',

@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
 use App\Models\Message;
+use App\Notifications\AdminActivityNotification;
+use App\Support\AccessControl;
+use App\Support\AdminNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -60,6 +63,16 @@ class UserChatController extends Controller
             'is_admin' => false,
         ]);
 
+        AdminNotifier::sendToPermission(
+            AccessControl::MANAGE_MESSAGES,
+            new AdminActivityNotification(
+                'New student support conversation',
+                'A new support conversation was started by '.(Auth::user()->name ?? 'a student').'.',
+                route('admin.chats.show', $chat->id),
+                ['type' => 'chat', 'chat_id' => $chat->id],
+            )
+        );
+
         return redirect()->route('user.chat.show', $chat->id);
     }
 
@@ -103,6 +116,17 @@ class UserChatController extends Controller
             'resolved_at' => null,
             'last_message_at' => now(),
         ]);
+
+        AdminNotifier::sendToPermission(
+            AccessControl::MANAGE_MESSAGES,
+            new AdminActivityNotification(
+                'Student replied in support chat',
+                'New unread student message in '.$chat->reference.'.',
+                route('admin.chats.show', $chat->id),
+                ['type' => 'chat', 'chat_id' => $chat->id],
+            )
+        );
+
         return redirect()->route('user.chat.show', $chat->id)->with('success', 'Message sent!');
     }
 
