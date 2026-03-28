@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AdminContactMessageMail;
 use App\Models\ContactMessage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class ContactController extends Controller
 {
@@ -23,7 +25,15 @@ class ContactController extends Controller
             'message.min' => 'Please write at least 10 characters in your message.',
         ]);
 
-        ContactMessage::create($request->only('name', 'email', 'subject', 'message'));
+        $contactMessage = ContactMessage::create($request->only('name', 'email', 'subject', 'message'));
+
+        $contactAddress = config('mail.notifications.contact_address', 'info@devroots.ac.ug');
+
+        if ($contactAddress) {
+            rescue(function () use ($contactAddress, $contactMessage) {
+                Mail::to($contactAddress)->send(new AdminContactMessageMail($contactMessage));
+            }, report: true);
+        }
 
         return back()->with('contact_success', 'Thank you! Your message has been sent. We\'ll get back to you within 24 hours.');
     }

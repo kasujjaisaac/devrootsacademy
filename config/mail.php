@@ -120,6 +120,8 @@ return [
         'admissions_name' => env('MAIL_ADMISSIONS_NAME', 'Admissions'),
         'payments_address' => env('MAIL_PAYMENTS_ADDRESS', env('MAIL_ADMISSIONS_ADDRESS')),
         'payments_name' => env('MAIL_PAYMENTS_NAME', env('MAIL_ADMISSIONS_NAME', 'Admissions')),
+        'contact_address' => env('MAIL_CONTACT_ADDRESS', 'info@devroots.ac.ug'),
+        'contact_name' => env('MAIL_CONTACT_NAME', 'DevRoots Info Desk'),
     ],
 
 ];

@@ -8,7 +8,7 @@
 .partner-detail-card {
     background: #fff;
     border: 1px solid rgba(15, 23, 42, 0.08);
-    padding: 1.5rem;
+    padding: .95rem;
     height: 100%;
     text-align: center;
     transition: transform .2s ease, box-shadow .2s ease;
@@ -19,21 +19,19 @@
 }
 .partner-detail-card img {
     width: 100%;
-    max-width: 140px;
-    height: 72px;
+    max-width: 104px;
+    height: 52px;
     object-fit: contain;
-    margin: 0 auto 1rem;
+    margin: 0 auto .7rem;
 }
 .partner-detail-card h4 {
-    margin-bottom: .35rem;
-}
-.partner-detail-card p {
     margin-bottom: 0;
+    font-size: .95rem;
 }
 .partner-category {
     display: inline-block;
-    margin-bottom: .75rem;
-    font-size: .75rem;
+    margin-bottom: .45rem;
+    font-size: .68rem;
     font-weight: 600;
     letter-spacing: .08em;
     text-transform: uppercase;
@@ -79,16 +77,15 @@
             <div class="col-lg-7">
                 <div class="row g-3">
                     @forelse($partners as $partner)
-                        <div class="col-md-6">
+                        <div class="col-md-6 col-xl-4">
                             <div class="partner-detail-card">
                                 <img src="{{ $partner->logo_url }}" alt="{{ $partner->name }}">
                                 @if($partner->category)
                                     <span class="partner-category">{{ $partner->category }}</span>
                                 @endif
                                 <h4>{{ $partner->name }}</h4>
-                                <p>{{ $partner->short_description ?: 'Partnering with DevRoots Academy to expand access to practical, industry-aligned technology education.' }}</p>
                                 @if($partner->website_url)
-                                    <div class="mt-3">
+                                    <div class="mt-2">
                                         <a href="{{ $partner->website_url }}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm">
                                             Visit Website
                                         </a>
