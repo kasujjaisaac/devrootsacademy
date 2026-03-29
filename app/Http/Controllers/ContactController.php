@@ -16,7 +16,7 @@ class ContactController extends Controller
 
     public function submit(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name'    => 'required|string|max:255',
             'email'   => 'required|email|max:255',
             'subject' => 'required|string|max:255',
@@ -25,9 +25,10 @@ class ContactController extends Controller
             'message.min' => 'Please write at least 10 characters in your message.',
         ]);
 
-        $contactMessage = ContactMessage::create($request->only('name', 'email', 'subject', 'message'));
+        $contactMessage = ContactMessage::createFromSubmission($validated);
 
-        $contactAddress = config('mail.notifications.contact_address', 'info@devroots.ac.ug');
+        $contactAddress = config('mail.notifications.admissions_address')
+            ?: config('mail.notifications.contact_address', 'info@devroots.ac.ug');
 
         if ($contactAddress) {
             rescue(function () use ($contactAddress, $contactMessage) {
